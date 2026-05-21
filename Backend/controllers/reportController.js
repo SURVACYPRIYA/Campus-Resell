@@ -7,7 +7,7 @@ exports.createReport = async (req, res) => {
         const { reportedUserId, reportedProductId, reason } = req.body;
         
         const report = await Report.create({
-            reporter: req.user.id,
+            reporter: req.user._id,
             reportedUser: reportedUserId,
             reportedProduct: reportedProductId,
             reason

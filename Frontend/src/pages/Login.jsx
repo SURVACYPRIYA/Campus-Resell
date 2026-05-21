@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -9,7 +10,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -87,6 +88,33 @@ const Login = () => {
         <p style={{ marginTop: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>
           Don't have an account? <a href="/register" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Register</a>
         </p>
+        
+        <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
+          <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }}></div>
+          <span style={{ padding: '0 10px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>OR</span>
+          <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }}></div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                setIsLoading(true);
+                setError('');
+                await googleLogin(credentialResponse.credential);
+                navigate('/marketplace');
+              } catch (err) {
+                console.error("Google Login error:", err);
+                setError(err.response?.data?.message || err.message || 'Google login failed');
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            onError={() => {
+              setError('Google login failed');
+            }}
+          />
+        </div>
       </div>
     </div>
   );

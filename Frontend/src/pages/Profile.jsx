@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from '../axios';
-import { Loader2, Package, Mail, User, ShieldCheck } from 'lucide-react';
+import { Loader2, Package, Mail, User, ShieldCheck, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3e%3crect width='800' height='600' fill='%23f1f5f9'/%3e%3cg transform='translate(360, 260)'%3e%3csvg width='80' height='80' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3e%3crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3e%3ccircle cx='8.5' cy='8.5' r='1.5'/%3e%3cpolyline points='21 15 16 10 5 21'/%3e%3c/svg%3e%3c/g%3e%3c/svg%3e";
@@ -27,6 +27,24 @@ const Profile = () => {
       fetchUserProducts();
     }
   }, [user]);
+
+  const handleDeleteProduct = async (productId) => {
+    if (!window.confirm('Are you sure you want to delete this listing? This will also remove all related chats and cannot be undone.')) {
+      return;
+    }
+    try {
+      await axios.delete(`/api/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setProducts((prev) => prev.filter((p) => p._id !== productId));
+      alert('Listing deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting product:', err);
+      alert(err.response?.data?.message || 'Failed to delete listing');
+    }
+  };
 
   if (loading) {
     return (
@@ -126,9 +144,42 @@ const Profile = () => {
                 <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#16a34a' }}>
                   ₹{Number(product.price).toLocaleString("en-IN")}
                 </span>
-                <Link to={`/product/${product._id}`} className="btn-primary" style={{ padding: '6px 15px', fontSize: '0.9rem', background: 'white', color: 'var(--text-main)', border: '1px solid var(--glass-border)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-                  View
-                </Link>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {product.status === 'sold' && (
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      title="Delete this sold listing"
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                        color: '#ef4444',
+                        cursor: 'pointer',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        fontWeight: '600',
+                        fontSize: '0.85rem',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)';
+                        e.currentTarget.style.borderColor = '#ef4444';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                      }}
+                    >
+                      <Trash2 size={15} />
+                      Delete
+                    </button>
+                  )}
+                  <Link to={`/product/${product._id}`} className="btn-primary" style={{ padding: '6px 15px', fontSize: '0.9rem' }}>
+                    View
+                  </Link>
+                </div>
               </div>
 
             </div>

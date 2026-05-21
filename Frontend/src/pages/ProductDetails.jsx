@@ -27,6 +27,14 @@ const ProductDetails = () => {
   const [showCamera, setShowCamera] = useState(false);
   const fileInputRef = React.useRef(null);
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editCategory, setEditCategory] = useState('');
+  const [editPrice, setEditPrice] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editStatus, setEditStatus] = useState('');
+
   const isSeller = user && product && product.seller && user._id === product.seller._id;
 
   const handleUpdatePhoto = (file) => {
@@ -65,6 +73,58 @@ const ProductDetails = () => {
 
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (product && !isEditing) {
+      setEditTitle(product.title || '');
+      setEditCategory(product.category || 'Others');
+      setEditPrice(product.price || '');
+      setEditDescription(product.description || '');
+      setEditStatus(product.status || 'available');
+    }
+  }, [product, isEditing]);
+
+  const handleSaveChanges = async () => {
+    if (!editTitle.trim()) {
+      alert('Title cannot be empty');
+      return;
+    }
+    if (!editPrice || Number(editPrice) <= 0) {
+      alert('Price must be a positive number');
+      return;
+    }
+    if (!editDescription.trim()) {
+      alert('Description cannot be empty');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await axios.patch(
+        `/api/products/${product._id}`,
+        {
+          title: editTitle,
+          category: editCategory,
+          price: Number(editPrice),
+          description: editDescription,
+          status: editStatus
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+      setProduct(res.data.data.product);
+      setIsEditing(false);
+      alert('Listing updated successfully!');
+    } catch (err) {
+      console.error('Error saving product changes:', err);
+      alert(err.response?.data?.message || 'Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleChat = async () => {
     if (!user) return navigate('/login');
@@ -270,30 +330,90 @@ const ProductDetails = () => {
               marginBottom: '20px'
             }}
           >
-            <div>
-              <span
-                style={{
-                  background: 'var(--primary)',
-                  color: 'white',
-                  padding: '4px 12px',
-                  borderRadius: '20px',
-                  fontSize: '0.8rem',
-                  textTransform: 'uppercase'
-                }}
-              >
-                {product.category}
-              </span>
+            <div style={{ flex: 1 }}>
+              {isEditing ? (
+                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '120px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '5px' }}>Category</label>
+                    <select
+                      value={editCategory}
+                      onChange={(e) => setEditCategory(e.target.value)}
+                      className="input-glass"
+                      style={{ padding: '8px 12px', fontSize: '0.9rem', height: '40px' }}
+                    >
+                      <option value="Books">Books</option>
+                      <option value="Cycles">Cycles</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Others">Others</option>
+                    </select>
+                  </div>
+                  <div style={{ flex: 1, minWidth: '120px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '5px' }}>Status</label>
+                    <select
+                      value={editStatus}
+                      onChange={(e) => setEditStatus(e.target.value)}
+                      className="input-glass"
+                      style={{ padding: '8px 12px', fontSize: '0.9rem', height: '40px' }}
+                    >
+                      <option value="available">Available</option>
+                      <option value="sold">Sold</option>
+                    </select>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
+                  <span
+                    style={{
+                      background: 'var(--primary)',
+                      color: 'white',
+                      padding: '4px 12px',
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      textTransform: 'uppercase',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {product.category}
+                  </span>
+                  <span
+                    style={{
+                      background: product.status === 'sold' ? '#ef4444' : '#16a34a',
+                      color: 'white',
+                      padding: '4px 12px',
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      textTransform: 'uppercase',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {product.status || 'available'}
+                  </span>
+                </div>
+              )}
 
-              <h1
-                style={{
-                  fontSize: '2.5rem',
-                  marginTop: '10px',
-                  marginBottom: '5px'
-                }}
-              >
-                {product.title}
-              </h1>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              {isEditing ? (
+                <div style={{ marginTop: '10px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '5px' }}>Title</label>
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="input-glass"
+                    style={{ fontSize: '1.5rem', fontWeight: 'bold', padding: '8px 12px' }}
+                  />
+                </div>
+              ) : (
+                <h1
+                  style={{
+                    fontSize: '2.5rem',
+                    marginTop: '10px',
+                    marginBottom: '5px'
+                  }}
+                >
+                  {product.title}
+                </h1>
+              )}
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '5px' }}>
                 Posted on {new Date(product.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
               </p>
             </div>
@@ -320,50 +440,77 @@ const ProductDetails = () => {
                 <Share2 size={24} />
               </button>
 
-              <button
-                onClick={handleReport}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#ef4444',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s'
-                }}
-                title="Report Product"
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.transform = 'scale(1.1)')
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.transform = 'scale(1)')
-                }
-              >
-                <ShieldAlert size={24} />
-              </button>
+              {!isSeller && (
+                <button
+                  onClick={handleReport}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#ef4444',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s'
+                  }}
+                  title="Report Product"
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = 'scale(1.1)')
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = 'scale(1)')
+                  }
+                >
+                  <ShieldAlert size={24} />
+                </button>
+              )}
             </div>
           </div>
 
           {/* PRICE */}
-          <h2
-            style={{
-              fontSize: '2rem',
-              color: '#16a34a',
-              marginBottom: '30px'
-            }}
-          >
-            ₹{Number(product.price).toLocaleString("en-IN")}
-          </h2>
+          {isEditing ? (
+            <div style={{ marginBottom: '25px' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '5px' }}>Price (₹)</label>
+              <input
+                type="number"
+                value={editPrice}
+                onChange={(e) => setEditPrice(e.target.value)}
+                className="input-glass"
+                style={{ fontSize: '1.25rem', fontWeight: 'bold', padding: '8px 12px', color: '#16a34a' }}
+              />
+            </div>
+          ) : (
+            <h2
+              style={{
+                fontSize: '2rem',
+                color: '#16a34a',
+                marginBottom: '30px'
+              }}
+            >
+              ₹{Number(product.price).toLocaleString("en-IN")}
+            </h2>
+          )}
 
           {/* DESCRIPTION */}
-          <p
-            style={{
-              color: 'var(--text-muted)',
-              lineHeight: '1.6',
-              marginBottom: '40px',
-              flex: 1
-            }}
-          >
-            {product.description}
-          </p>
+          {isEditing ? (
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, marginBottom: '30px' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '5px' }}>Description</label>
+              <textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="input-glass"
+                style={{ flex: 1, minHeight: '150px', resize: 'vertical', lineHeight: '1.6', padding: '12px' }}
+              />
+            </div>
+          ) : (
+            <p
+              style={{
+                color: 'var(--text-muted)',
+                lineHeight: '1.6',
+                marginBottom: '40px',
+                flex: 1
+              }}
+            >
+              {product.description}
+            </p>
+          )}
 
           {/* SELLER CARD */}
           <div
@@ -402,22 +549,83 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* CHAT / CONNECT BUTTON */}
-          <button
-            onClick={handleChat}
-            className="btn-primary"
-            style={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '15px'
-            }}
-          >
-            <MessageCircle size={20} />
-            Chat to Buy / Connect
-          </button>
+          {/* CHAT / CONNECT BUTTON / OWNER EDIT CONTROLS */}
+          {isSeller ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
+              {isEditing ? (
+                <div style={{ display: 'flex', gap: '15px' }}>
+                  <button
+                    onClick={handleSaveChanges}
+                    className="btn-primary"
+                    style={{ flex: 1, padding: '15px' }}
+                    disabled={saving}
+                  >
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    style={{
+                      flex: 1,
+                      padding: '15px',
+                      background: 'transparent',
+                      border: '1px solid var(--glass-border)',
+                      color: 'var(--text-muted)',
+                      borderRadius: '6px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="btn-primary"
+                    style={{ flex: 1, padding: '15px', minWidth: '150px' }}
+                  >
+                    Edit Listing
+                  </button>
+                  <div
+                    style={{
+                      flex: 1.5,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '15px',
+                      background: 'rgba(35, 53, 89, 0.05)',
+                      color: 'var(--text-muted)',
+                      borderRadius: '8px',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      border: '1px dashed var(--glass-border)',
+                      minWidth: '200px'
+                    }}
+                  >
+                    <span>This is your listing</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={handleChat}
+              className="btn-primary"
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '15px'
+              }}
+            >
+              <MessageCircle size={20} />
+              Chat to Buy / Connect
+            </button>
+          )}
         </div>
       </div>
       {showCamera && (

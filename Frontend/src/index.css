@@ -114,7 +114,9 @@ select.input-glass {
 /* Custom Nav links */
 .nav-link {
   position: relative;
-  transition: color 0.2s ease;
+  transition: color 0.25s ease, transform 0.25s ease;
+  display: inline-flex;
+  align-items: center;
 }
 
 .nav-link::after {
@@ -123,13 +125,15 @@ select.input-glass {
   width: 0;
   height: 2px;
   bottom: -4px;
-  left: 0;
+  left: 50%;
   background-color: var(--secondary);
-  transition: width 0.2s ease;
+  transition: all 0.25s ease;
+  transform: translateX(-50%);
 }
 
 .nav-link:hover {
-  color: white !important;
+  color: var(--primary) !important;
+  transform: translateY(-2px);
 }
 
 .nav-link:hover::after {

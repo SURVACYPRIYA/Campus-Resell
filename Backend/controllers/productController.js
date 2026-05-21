@@ -10,7 +10,7 @@ exports.createProduct = async (req, res) => {
             price,
             category,
             images,
-            seller: req.user.id
+            seller: req.user._id
         });
 
         res.status(201).json({
@@ -82,7 +82,7 @@ exports.updateProduct = async (req, res) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        if (product.seller.toString() !== req.user.id && req.user.role !== 'admin') {
+        if (product.seller.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
             return res.status(403).json({ message: 'You are not authorized to update this product' });
         }
 
@@ -99,3 +99,38 @@ exports.updateProduct = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+exports.deleteProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Only the seller or admin can delete
+        if (product.seller.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'You are not authorized to delete this product' });
+        }
+
+        // Clean up related chats and messages
+        const Chat = require('../models/Chat');
+        const Message = require('../models/Message');
+        const relatedChats = await Chat.find({ product: req.params.id });
+        const chatIds = relatedChats.map(c => c._id);
+        if (chatIds.length > 0) {
+            await Message.deleteMany({ chat: { $in: chatIds } });
+            await Chat.deleteMany({ product: req.params.id });
+        }
+
+        await Product.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Product deleted successfully'
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+

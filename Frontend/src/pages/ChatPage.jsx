@@ -13,7 +13,8 @@ import io from 'socket.io-client';
 import {
   Send,
   Loader2,
-  MessageSquare
+  MessageSquare,
+  Trash2
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
@@ -176,6 +177,39 @@ const ChatPage = () => {
     } catch (err) {
 
       console.error(err);
+    }
+  };
+
+  // DELETE CONVERSATION
+  const handleDeleteChat = async (chatId) => {
+    if (!window.confirm("Are you sure you want to delete this conversation? This will delete all messages and cannot be undone.")) {
+      return;
+    }
+
+    try {
+      console.log('Attempting to delete chat with ID:', chatId);
+        await axios.delete(
+          `/api/chats/${chatId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
+
+      // Remove from chats list
+      setChats((prev) => prev.filter((c) => c._id !== chatId));
+
+      // If the deleted chat was the active chat, reset active chat
+      if (activeChat?._id === chatId) {
+        setActiveChat(null);
+        setMessages([]);
+      }
+
+      alert('Conversation deleted successfully!');
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert(err.response?.data?.message || err.message || 'Failed to delete conversation');
     }
   };
 
@@ -415,22 +449,60 @@ const ChatPage = () => {
             {/* HEADER */}
             <div
               style={{
-                padding: '20px',
-                borderBottom:
-                  '1px solid var(--glass-border)'
+                padding: '15px 20px',
+                borderBottom: '1px solid var(--glass-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '10px'
               }}
             >
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem' }}>
+                  {
+                    activeChat
+                      .participants.find(
+                        (p) =>
+                          p._id !== user._id
+                      )?.name
+                  }
+                </h3>
+                {activeChat.product && (
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
+                    Regarding: <strong>{activeChat.product.title}</strong> (₹{Number(activeChat.product.price).toLocaleString("en-IN")})
+                  </p>
+                )}
+              </div>
 
-              <h3>
-                {
-                  activeChat
-                    .participants.find(
-                      (p) =>
-                        p._id !== user._id
-                    )?.name
-                }
-              </h3>
-
+              <button
+                onClick={() => handleDeleteChat(activeChat._id)}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  color: '#ef4444',
+                  cursor: 'pointer',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontWeight: '600',
+                  fontSize: '0.85rem',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)';
+                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                }}
+              >
+                <Trash2 size={16} />
+                Delete Chat
+              </button>
             </div>
 
             {/* MESSAGES */}
@@ -449,40 +521,47 @@ const ChatPage = () => {
                 (msg, index) => (
 
                   <div
-                    key={
-                      msg._id || index
-                    }
+                    key={msg._id || index}
                     style={{
-                      alignSelf:
-                        msg.sender?._id ===
-                        user._id
-                          ? 'flex-end'
-                          : 'flex-start',
-
-                      background:
-                        msg.sender?._id ===
-                        user._id
-                          ? 'var(--primary)'
-                          : '#e2e8f0',
-
-                      padding:
-                        '12px 18px',
-
-                      borderRadius:
-                        '18px',
-
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignSelf: msg.sender?._id === user._id ? 'flex-end' : 'flex-start',
                       maxWidth: '70%',
-
-                      color:
-                        msg.sender?._id ===
-                        user._id
-                          ? '#ffffff'
-                          : 'var(--text-main)'
+                      gap: '4px',
+                      marginTop: '5px'
                     }}
                   >
-
-                    {msg.content}
-
+                    <span 
+                      style={{ 
+                        fontSize: '0.75rem', 
+                        color: 'var(--text-muted)', 
+                        alignSelf: msg.sender?._id === user._id ? 'flex-end' : 'flex-start',
+                        padding: '0 4px'
+                      }}
+                    >
+                      {msg.sender?._id === user._id ? 'You' : msg.sender?.name || 'Unknown'}
+                    </span>
+                    <div
+                      style={{
+                        background: msg.sender?._id === user._id ? 'var(--primary)' : '#e2e8f0',
+                        padding: '12px 18px',
+                        borderRadius: '18px',
+                        color: msg.sender?._id === user._id ? '#ffffff' : 'var(--text-main)',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
+                      }}
+                    >
+                      {msg.content}
+                    </div>
+                    <span 
+                      style={{ 
+                        fontSize: '0.7rem', 
+                        color: 'var(--text-muted)', 
+                        alignSelf: msg.sender?._id === user._id ? 'flex-end' : 'flex-start',
+                        padding: '0 4px'
+                      }}
+                    >
+                      {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                    </span>
                   </div>
 
                 )

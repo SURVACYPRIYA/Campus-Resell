@@ -2,6 +2,10 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const dotenv = require('dotenv');
+
+// LOAD ENV
+dotenv.config();
+
 const cors = require('cors');
 
 const connectDB = require('./config/db');
@@ -13,9 +17,6 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const reportRoutes = require('./routes/reportRoutes');
-
-// LOAD ENV
-dotenv.config();
 
 // CONNECT DATABASE
 connectDB();
