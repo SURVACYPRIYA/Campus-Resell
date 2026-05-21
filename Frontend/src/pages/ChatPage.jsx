@@ -266,8 +266,7 @@ const ChatPage = () => {
         padding: '20px',
         maxWidth: '1200px',
         margin: '0 auto',
-        height:
-          'calc(100vh - 150px)'
+        height: 'calc(100vh - 140px)'
       }}
     >
 
@@ -275,17 +274,13 @@ const ChatPage = () => {
         className="glass-card chat-container"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(0, 1fr))', /* Fallback */
+          gridTemplateColumns: '350px 1fr',
           height: '100%',
           overflow: 'hidden'
         }}
       >
-        {/* WE WILL USE CSS IN App.css FOR RESPONSIVENESS, OR JUST INLINE HERE */}
         <style>
           {`
-            .chat-container {
-              grid-template-columns: 350px minmax(0, 1fr) !important;
-            }
             @media (max-width: 768px) {
               .chat-container {
                 grid-template-columns: 1fr !important;
@@ -442,7 +437,9 @@ const ChatPage = () => {
           <div
             style={{
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              height: '100%',
+              overflow: 'hidden'
             }}
           >
 
@@ -455,7 +452,8 @@ const ChatPage = () => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                gap: '10px'
+                gap: '10px',
+                flexShrink: 0
               }}
             >
               <div>
@@ -505,21 +503,20 @@ const ChatPage = () => {
               </button>
             </div>
 
-            {/* MESSAGES */}
+            {/* MESSAGES CONTAINER */}
             <div
               style={{
                 flex: 1,
-                padding: '20px',
                 overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '15px'
+                gap: '15px',
+                padding: '20px',
+                minHeight: 0
               }}
             >
-
               {messages.map(
                 (msg, index) => (
-
                   <div
                     key={msg._id || index}
                     style={{
@@ -563,14 +560,9 @@ const ChatPage = () => {
                       {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                     </span>
                   </div>
-
                 )
               )}
-
-              <div
-                ref={messagesEndRef}
-              />
-
+              <div ref={messagesEndRef} />
             </div>
 
             {/* QUICK NEGO TEMPLATES */}
@@ -581,7 +573,8 @@ const ChatPage = () => {
               display: 'flex',
               gap: '10px',
               overflowX: 'auto',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              flexShrink: 0
             }}>
               {[
                 "Is this still available?",
@@ -622,15 +615,13 @@ const ChatPage = () => {
 
             {/* INPUT */}
             <form
-              onSubmit={
-                handleSendMessage
-              }
+              onSubmit={handleSendMessage}
               style={{
                 display: 'flex',
                 gap: '10px',
-                padding: '20px',
-                borderTop:
-                  '1px solid var(--glass-border)'
+                padding: '15px 20px',
+                borderTop: '1px solid var(--glass-border)',
+                flexShrink: 0
               }}
             >
 
@@ -644,6 +635,7 @@ const ChatPage = () => {
                     e.target.value
                   )
                 }
+                style={{ flex: 1 }}
               />
 
               <button
