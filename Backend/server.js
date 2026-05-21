@@ -1,0 +1,166 @@
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const dotenv = require('dotenv');
+const cors = require('cors');
+
+const connectDB = require('./config/db');
+
+const Chat = require('./models/Chat');
+const Message = require('./models/Message');
+
+const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const reportRoutes = require('./routes/reportRoutes');
+
+// LOAD ENV
+dotenv.config();
+
+// CONNECT DATABASE
+connectDB();
+
+const app = express();
+
+const server = http.createServer(app);
+
+// SOCKET.IO
+const io = new Server(server, {
+    cors: {
+        origin:
+            process.env.FRONTEND_URL ||
+            'http://localhost:5173',
+
+        methods: ['GET', 'POST']
+    }
+});
+
+// MIDDLEWARE
+app.use(express.json());
+
+app.use(cors({
+    origin:
+        process.env.FRONTEND_URL ||
+        'http://localhost:5173',
+
+    credentials: true
+}));
+
+// ROUTES
+app.use('/api/auth', authRoutes);
+
+app.use('/api/products', productRoutes);
+
+app.use('/api/chats', chatRoutes);
+
+app.use('/api/reports', reportRoutes);
+
+// TEST ROUTE
+app.get('/', (req, res) => {
+    res.send('Campus Resell API is running...');
+});
+
+// SOCKET CONNECTION
+io.on('connection', (socket) => {
+
+    console.log(
+        'User connected:',
+        socket.id
+    );
+
+    // JOIN CHAT ROOM
+    socket.on('join_chat', (chatId) => {
+
+        socket.join(chatId);
+
+        console.log(
+            `User joined chat: ${chatId}`
+        );
+    });
+
+    // SEND MESSAGE
+    socket.on(
+        'send_message',
+        async (data) => {
+
+            try {
+
+                // CREATE MESSAGE
+                const newMessage =
+                    await Message.create({
+                        chat: data.chatId,
+
+                        sender:
+                            data.senderId,
+
+                        content:
+                            data.content
+                    });
+
+                // UPDATE LAST MESSAGE
+                await Chat.findByIdAndUpdate(
+                    data.chatId,
+                    {
+                        lastMessage:
+                            newMessage._id
+                    }
+                );
+
+                // POPULATE SENDER
+                const populatedMessage =
+                    await Message.findById(
+                        newMessage._id
+                    ).populate('sender');
+
+                // SEND TO EVERYONE
+                io.to(data.chatId).emit(
+                    'receive_message',
+                    {
+                        _id:
+                            populatedMessage._id,
+
+                        chatId:
+                            data.chatId,
+
+                        sender:
+                            populatedMessage.sender,
+
+                        content:
+                            populatedMessage.content,
+
+                        createdAt:
+                            populatedMessage.createdAt
+                    }
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Socket error:',
+                    error
+                );
+            }
+        }
+    );
+
+    // DISCONNECT
+    socket.on('disconnect', () => {
+
+        console.log(
+            'User disconnected'
+        );
+    });
+
+});
+
+// PORT
+const PORT =
+    process.env.PORT || 5000;
+
+// START SERVER
+server.listen(PORT, () => {
+
+    console.log(
+        `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
+    );
+});
