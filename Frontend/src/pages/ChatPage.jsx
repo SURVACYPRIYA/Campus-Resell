@@ -339,17 +339,9 @@ const ChatPage = () => {
                   }}
                 >
 
-                  <img
-                    src={
-                      otherParticipant.avatar
-                    }
-                    alt=""
-                    style={{
-                      width: '45px',
-                      height: '45px',
-                      borderRadius: '50%'
-                    }}
-                  />
+                  <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8b1a25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'white', userSelect: 'none' }}>{otherParticipant.name?.charAt(0)?.toUpperCase() || '?'}</span>
+                  </div>
 
                   <div
                     style={{
