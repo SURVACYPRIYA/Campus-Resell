@@ -24,8 +24,20 @@ exports.createProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
     try {
-        const { category, search } = req.query;
-        let query = { status: 'available' };
+        const { category, search, seller, status } = req.query;
+        let query = {};
+
+        if (status === 'all') {
+            // No status filter
+        } else if (status) {
+            query.status = status;
+        } else {
+            query.status = 'available'; // Default behavior
+        }
+
+        if (seller) {
+            query.seller = seller;
+        }
 
         if (category) {
             query.category = category;

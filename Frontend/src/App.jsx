@@ -10,6 +10,10 @@ import ProductDetails from './pages/ProductDetails';
 import ChatPage from './pages/ChatPage';
 import AdminDashboard from './pages/AdminDashboard';
 import CreateProduct from './pages/CreateProduct';
+import Profile from './pages/Profile';
+import Story from './pages/Story';
+import FAQ from './pages/FAQ';
+import Contact from './pages/Contact';
 import { useAuth } from './context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import './index.css';
@@ -43,6 +47,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/story" element={<Story />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/contact" element={<Contact />} />
             <Route 
               path="/marketplace" 
               element={
@@ -80,6 +87,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CreateProduct />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               } 
             />

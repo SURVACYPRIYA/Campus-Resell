@@ -107,10 +107,10 @@ const Navbar = () => {
                 <PlusCircle size={18} style={{ color: 'var(--primary)' }} /> <span>Sell</span>
               </Link>
               <Link to="/chat" className="nav-link" style={{ color: '#233559', display: 'flex', alignItems: 'center' }}><MessageSquare size={18} /></Link>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#233559', padding: '4px 12px', background: 'rgba(35, 53, 89, 0.05)', borderRadius: '20px', border: '1px solid rgba(35, 53, 89, 0.1)' }}>
+              <Link to="/profile" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', color: '#233559', padding: '4px 12px', background: 'rgba(35, 53, 89, 0.05)', borderRadius: '20px', border: '1px solid rgba(35, 53, 89, 0.1)' }}>
                 <img src={user.avatar} alt={user.name} style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
                 <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>{user.name}</span>
-              </div>
+              </Link>
               <button onClick={logout} style={{ background: 'transparent', border: 'none', color: '#233559', cursor: 'pointer', display: 'flex', alignItems: 'center', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'} onMouseLeave={(e) => e.currentTarget.style.color = '#233559'}>
                 <LogOut size={18} />
               </button>

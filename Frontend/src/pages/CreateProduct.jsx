@@ -17,6 +17,7 @@ const CreateProduct = () => {
     category: 'Books',
     imageUrl: ''
   });
+  const [imageFiles, setImageFiles] = useState([]);
 
   const categories = ['Books', 'Cycles', 'Electronics', 'Others'];
 
@@ -27,16 +28,37 @@ const CreateProduct = () => {
 
     setLoading(true);
 
+    // Validate that at least one image is provided (file(s) or link)
+    if (imageFiles.length === 0 && !formData.imageUrl) {
+      alert('Please provide at least one product image (photo or link).');
+      setLoading(false);
+      return;
+    }
+
+    // Prepare image URLs (placeholder handling for file uploads)
+    const imageUrls = [];
+    // Add URLs from uploaded files
+    imageFiles.forEach((file) => {
+      const fileUrl = URL.createObjectURL(file);
+      imageUrls.push(fileUrl);
+    });
+    // Add URLs from link input (comma‑separated)
+    if (formData.imageUrl) {
+      const links = formData.imageUrl.split(',').map(l => l.trim()).filter(l => l);
+      imageUrls.push(...links);
+    }
+    // Fallback placeholder if still empty
+    if (imageUrls.length === 0) {
+      imageUrls.push('https://via.placeholder.com/300?text=Product+Image');
+    }
+
     try {
       await axios.post(
         '/api/products',
         {
           ...formData,
           price: Number(formData.price),
-          images: [
-            formData.imageUrl ||
-              'https://via.placeholder.com/300?text=Product+Image'
-          ]
+          images: imageUrls
         },
         {
           headers: {
@@ -257,7 +279,7 @@ const CreateProduct = () => {
             ></textarea>
           </div>
 
-          {/* IMAGE URL */}
+          {/* IMAGE INPUT (Camera or Link) */}
           <div
             style={{
               marginBottom: '30px'
@@ -270,9 +292,61 @@ const CreateProduct = () => {
                 color: 'var(--text-muted)'
               }}
             >
-              Image URL (Optional)
+              Add Product Image (Required)
             </label>
 
+            {/* Option 1: Capture Photo via Camera */}
+            <div
+              style={{
+                marginBottom: '15px',
+                position: 'relative'
+              }}
+            >
+              <Upload
+                style={{
+                  position: 'absolute',
+                  left: '15px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-muted)'
+                }}
+                size={18}
+              />
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                multiple
+                className="input-glass"
+                style={{
+                  paddingLeft: '45px'
+                }}
+                onChange={(e) => {
+                  if (e.target.files) {
+                    // Convert FileList to array and merge with existing selection
+                    setImageFiles([...imageFiles, ...Array.from(e.target.files)]);
+                  }
+                }}
+              />
+              {/* Preview selected files */}
+              <div style={{ marginTop: '10px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                {imageFiles.map((file, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>{file.name}</span>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                      onClick={() => setImageFiles(imageFiles.filter((_, i) => i !== idx))}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Option 2: Provide Image Link */}
             <div
               style={{
                 position: 'relative'
@@ -288,7 +362,6 @@ const CreateProduct = () => {
                 }}
                 size={18}
               />
-
               <input
                 type="text"
                 className="input-glass"
