@@ -43,9 +43,15 @@ exports.getAllProducts = async (req, res) => {
             query.category = category;
         }
 
+        if (req.query.buyer) {
+            query.buyer = req.query.buyer;
+        }
+
         if (search) {
             query.title = { $regex: search, $options: 'i' };
         }
+
+        console.log("getAllProducts query:", query);
 
         const products = await Product.find(query).populate('seller', 'name avatar');
 
@@ -86,7 +92,13 @@ exports.updateProduct = async (req, res) => {
             return res.status(403).json({ message: 'You are not authorized to update this product' });
         }
 
-        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, {
+        const updateData = { ...req.body };
+        if (updateData.status === 'available') {
+            updateData.$unset = { buyer: 1 };
+            delete updateData.buyer;
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
             runValidators: true
         });

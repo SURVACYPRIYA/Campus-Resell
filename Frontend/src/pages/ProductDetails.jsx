@@ -34,6 +34,8 @@ const ProductDetails = () => {
   const [editPrice, setEditPrice] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editStatus, setEditStatus] = useState('');
+  const [editBuyer, setEditBuyer] = useState('');
+  const [interestedBuyers, setInterestedBuyers] = useState([]);
 
   const isSeller = user && product && product.seller && user._id === product.seller._id;
 
@@ -81,8 +83,23 @@ const ProductDetails = () => {
       setEditPrice(product.price || '');
       setEditDescription(product.description || '');
       setEditStatus(product.status || 'available');
+      setEditBuyer(product.buyer || '');
     }
-  }, [product, isEditing]);
+    
+    if (isEditing && isSeller) {
+      const fetchBuyers = async () => {
+        try {
+          const res = await axios.get(`/api/chats/product/${product._id}/buyers`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          });
+          setInterestedBuyers(res.data.data.buyers || []);
+        } catch (err) {
+          console.error('Failed to fetch interested buyers', err);
+        }
+      };
+      fetchBuyers();
+    }
+  }, [product, isEditing, isSeller]);
 
   const handleSaveChanges = async () => {
     if (!editTitle.trim()) {
@@ -107,7 +124,8 @@ const ProductDetails = () => {
           category: editCategory,
           price: Number(editPrice),
           description: editDescription,
-          status: editStatus
+          status: editStatus,
+          buyer: editStatus === 'sold' ? editBuyer : null
         },
         {
           headers: {
@@ -359,6 +377,22 @@ const ProductDetails = () => {
                       <option value="sold">Sold</option>
                     </select>
                   </div>
+                  {editStatus === 'sold' && (
+                    <div style={{ flex: 1, minWidth: '120px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '5px' }}>Buyer (Optional)</label>
+                      <select
+                        value={editBuyer}
+                        onChange={(e) => setEditBuyer(e.target.value)}
+                        className="input-glass"
+                        style={{ padding: '8px 12px', fontSize: '0.9rem', height: '40px' }}
+                      >
+                        <option value="">Select a buyer</option>
+                        {interestedBuyers.map(b => (
+                          <option key={b._id} value={b._id}>{b.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>

@@ -32,6 +32,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         enum: ['available', 'sold'],
         default: 'available'
+    },
+    buyer: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
     }
 }, {
     timestamps: true

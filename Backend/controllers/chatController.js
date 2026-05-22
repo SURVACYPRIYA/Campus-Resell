@@ -87,8 +87,27 @@ exports.deleteChat = async (req, res) => {
   }
 };
 
+exports.getInterestedBuyers = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const chats = await Chat.find({ product: productId }).populate('participants', 'name email avatar');
+        
+        const buyers = [];
+        chats.forEach(chat => {
+            chat.participants.forEach(participant => {
+                if (participant._id.toString() !== req.user._id.toString()) {
+                    buyers.push(participant);
+                }
+            });
+        });
 
+        const uniqueBuyers = Array.from(new Map(buyers.map(b => [b._id.toString(), b])).values());
 
-
-
-
+        res.status(200).json({
+            status: 'success',
+            data: { buyers: uniqueBuyers }
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

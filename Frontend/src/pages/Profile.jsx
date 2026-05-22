@@ -9,13 +9,18 @@ const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www
 const Profile = () => {
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
+  const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserProducts = async () => {
       try {
-        const res = await axios.get(`/api/products?seller=${user._id}&status=all`);
-        setProducts(res.data.data.products);
+        const [resProducts, resPurchases] = await Promise.all([
+          axios.get(`/api/products?seller=${user._id}&status=all`),
+          axios.get(`/api/products?buyer=${user._id}&status=sold`)
+        ]);
+        setProducts(resProducts.data.data.products);
+        setPurchases(resPurchases.data.data.products);
       } catch (err) {
         console.error(err);
       } finally {
@@ -180,6 +185,71 @@ const Profile = () => {
                     View
                   </Link>
                 </div>
+              </div>
+
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* YOUR PURCHASES */}
+      <h2 style={{ fontSize: '1.8rem', marginBottom: '20px', marginTop: '60px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <Package size={24} color="var(--primary)" />
+        Your Purchases
+      </h2>
+      
+      {purchases.length === 0 ? (
+        <div className="glass-card" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: '1.2rem' }}>You haven't bought any products yet.</p>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '30px' }}>
+          {purchases.map((product) => (
+            <div key={product._id} className="glass-card animate-fade-in" style={{ padding: '15px', display: 'flex', flexDirection: 'column' }}>
+              
+              <div style={{ position: 'relative', width: '100%', height: '200px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '15px', overflow: 'hidden' }}>
+                <img 
+                  src={product.images[0] || fallbackImage} 
+                  alt={product.title} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = fallbackImage;
+                  }}
+                />
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '10px', 
+                  right: '10px', 
+                  background: '#16a34a', 
+                  color: 'white', 
+                  padding: '4px 12px', 
+                  borderRadius: '20px', 
+                  fontSize: '0.8rem', 
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase'
+                }}>
+                  Purchased
+                </div>
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                  {product.category}
+                </span>
+                <h3 style={{ marginBottom: '4px', marginTop: '5px' }}>{product.title}</h3>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                  Bought from {product.seller?.name || 'Unknown'}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#16a34a' }}>
+                  ₹{Number(product.price).toLocaleString("en-IN")}
+                </span>
+                <Link to={`/product/${product._id}`} className="btn-primary" style={{ padding: '6px 15px', fontSize: '0.9rem' }}>
+                  View
+                </Link>
               </div>
 
             </div>
