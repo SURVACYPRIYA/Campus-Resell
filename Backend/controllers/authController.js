@@ -108,18 +108,38 @@ exports.getMe = async (req, res) => {
 
 exports.googleLogin = async (req, res) => {
     try {
-        const { token } = req.body;
-        if (!token) {
+        const { token, accessToken } = req.body;
+        if (!token && !accessToken) {
             return res.status(400).json({ message: 'No Google token provided' });
         }
 
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID_HERE',
-        });
-        
-        const payload = ticket.getPayload();
-        const { email, name, picture } = payload;
+        let email, name, picture;
+
+        if (accessToken) {
+            // Validate using Google UserInfo API for Access Token
+            const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch user info from Google');
+            }
+            
+            const data = await response.json();
+            email = data.email;
+            name = data.name;
+            picture = data.picture;
+        } else {
+            // Validate using Google Auth Library for ID Token (Backward compatibility)
+            const ticket = await client.verifyIdToken({
+                idToken: token,
+                audience: process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID_HERE',
+            });
+            const payload = ticket.getPayload();
+            email = payload.email;
+            name = payload.name;
+            picture = payload.picture;
+        }
 
         // Check if user exists
         let user = await User.findOne({ email });
