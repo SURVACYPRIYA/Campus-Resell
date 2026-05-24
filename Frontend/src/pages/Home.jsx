@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Zap, Users, MapPin, ShieldAlert, Star } from 'lucide-react';
+import { ShieldCheck, Zap, Users, MapPin, ShieldAlert, Star, ArrowRight, Book, Monitor, Armchair, Coffee, Settings, Activity, Bike, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
@@ -126,6 +126,60 @@ const Home = () => {
                 <p style={{ color: 'var(--text-muted)', lineHeight: '1.5' }}>{feature.desc}</p>
               </motion.div>
             ))}
+          </section>
+
+          {/* BROWSE BY CATEGORY */}
+          <section style={{ marginTop: '80px', textAlign: 'center' }}>
+            <span style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Explore</span>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '10px', marginBottom: '8px', color: '#233559' }}>Browse by Category</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '40px' }}>Find exactly what you need from our organized categories</p>
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
+              {[
+                { name: "Furniture", icon: <Armchair size={28} />, path: "/marketplace?category=Furniture" },
+                { name: "Electronics", icon: <Monitor size={28} />, path: "/marketplace?category=Electronics" },
+                { name: "Books", icon: <Book size={28} />, path: "/marketplace?category=Books" },
+                { name: "Appliances", icon: <Coffee size={28} />, path: "/marketplace?category=Appliances" },
+                { name: "Engineering", icon: <Settings size={28} />, path: "/marketplace?category=Engineering" },
+                { name: "Medical", icon: <Activity size={28} />, path: "/marketplace?category=Medical" },
+                { name: "Vehicles", icon: <Bike size={28} />, path: "/marketplace?category=Vehicles" },
+                { name: "Other", icon: <Package size={28} />, path: "/marketplace?category=Other" }
+              ].map((cat, i) => (
+                <Link key={i} to={cat.path} style={{ textDecoration: 'none' }}>
+                  <motion.div 
+                    whileHover={{ y: -5, boxShadow: '0 12px 28px rgba(0,0,0,0.08)' }}
+                    className="glass-card"
+                    style={{ 
+                      width: '130px', 
+                      height: '130px', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      gap: '15px',
+                      cursor: 'pointer',
+                      border: '1px solid var(--glass-border)',
+                      borderRadius: '16px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--primary)';
+                      e.currentTarget.style.background = 'rgba(193, 38, 50, 0.02)';
+                      e.currentTarget.querySelector('.cat-icon').style.color = 'var(--primary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--glass-border)';
+                      e.currentTarget.style.background = '#ffffff';
+                      e.currentTarget.querySelector('.cat-icon').style.color = '#64748b';
+                    }}
+                  >
+                    <div className="cat-icon" style={{ color: '#64748b', transition: 'color 0.2s' }}>
+                      {cat.icon}
+                    </div>
+                    <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)' }}>{cat.name}</span>
+                  </motion.div>
+                </Link>
+              ))}
+            </div>
           </section>
 
           {/* CAMPUS STATS */}
