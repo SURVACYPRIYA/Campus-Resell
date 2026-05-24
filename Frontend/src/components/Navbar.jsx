@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, MessageSquare, LogOut, PlusCircle, MoreVertical, HelpCircle, BookOpen, Mail } from 'lucide-react';
+import { MessageSquare, PlusCircle, MoreVertical, HelpCircle, BookOpen, Mail, ChevronDown, LifeBuoy } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
 
@@ -130,75 +130,93 @@ const Navbar = () => {
           {/* Support Dropdown */}
           <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
             <button
-              onClick={() => {
-                // close profile menu first to prevent overlap
-                setShowProfileMenu(false);
-                // toggle support menu using component state (handled below)
-                // eslint-disable-next-line no-undef
-                setShowSupportMenu(v => !v);
-              }}
+              onClick={() => { setShowProfileMenu(false); setShowSupportMenu(v => !v); }}
               style={{
-                background: 'none',
-                border: 'none',
+                background: showSupportMenu ? 'rgba(193,38,50,0.1)' : 'transparent',
+                border: '1.5px solid',
+                borderColor: showSupportMenu ? 'var(--primary)' : 'rgba(35,53,89,0.15)',
                 cursor: 'pointer',
-                color: '#233559',
+                color: showSupportMenu ? 'var(--primary)' : '#233559',
                 fontWeight: '600',
-                fontSize: '0.95rem',
+                fontSize: '0.88rem',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: 0
+                padding: '6px 14px',
+                borderRadius: '20px',
+                transition: 'all 0.2s ease',
+                letterSpacing: '0.02em'
+              }}
+              onMouseEnter={(e) => {
+                if (!showSupportMenu) {
+                  e.currentTarget.style.background = 'rgba(193,38,50,0.07)';
+                  e.currentTarget.style.borderColor = 'var(--primary)';
+                  e.currentTarget.style.color = 'var(--primary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!showSupportMenu) {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'rgba(35,53,89,0.15)';
+                  e.currentTarget.style.color = '#233559';
+                }
               }}
               title="Support"
             >
+              <LifeBuoy size={15} />
               Support
-              <MoreVertical size={18} style={{ color: 'var(--primary)' }} />
+              <ChevronDown size={14} style={{ transition: 'transform 0.2s', transform: showSupportMenu ? 'rotate(180deg)' : 'rotate(0deg)' }} />
             </button>
 
-            {/** dropdown layer */}
             {showSupportMenu && (
               <div style={{
                 position: 'absolute',
                 top: '44px',
-                left: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
                 background: '#ffffff',
                 border: '1px solid var(--glass-border)',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                borderRadius: '14px',
+                boxShadow: '0 8px 32px rgba(35,53,89,0.12), 0 2px 8px rgba(0,0,0,0.06)',
                 zIndex: 1000,
-                minWidth: '180px'
+                minWidth: '210px',
+                overflow: 'hidden',
+                padding: '8px 0'
               }}>
-                <button
-                  onClick={() => {
-                    setShowSupportMenu(false);
-                    navigate('/story');
-                  }}
-                  style={{ ...menuItemStyle, display: 'flex', alignItems: 'center', gap: '10px' }}
-                >
-                  <BookOpen size={18} style={{ color: 'var(--primary)' }} />
-                  About
-                </button>
-                <button
-                  onClick={() => {
-                    setShowSupportMenu(false);
-                    navigate('/faq');
-                  }}
-                  style={{ ...menuItemStyle, display: 'flex', alignItems: 'center', gap: '10px' }}
-                >
-                  <HelpCircle size={18} style={{ color: 'var(--primary)' }} />
-                  FAQ
-                </button>
-                <button
-                  onClick={() => {
-                    setShowSupportMenu(false);
-                    navigate('/contact');
-                  }}
-                  style={{ ...menuItemStyle, display: 'flex', alignItems: 'center', gap: '10px' }}
-                >
-                  <Mail size={18} style={{ color: 'var(--primary)' }} />
-                  Contact
-                </button>
-
+                {/* Section header */}
+                <div style={{ padding: '6px 16px 10px', borderBottom: '1px solid #f1f5f9', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--primary)' }}>Help & Resources</span>
+                </div>
+                {[
+                  { icon: <BookOpen size={16} />, label: 'Our Story', path: '/story' },
+                  { icon: <HelpCircle size={16} />, label: 'FAQ', path: '/faq' },
+                  { icon: <Mail size={16} />, label: 'Contact Us', path: '/contact' },
+                ].map((item) => (
+                  <button
+                    key={item.path}
+                    onClick={() => { setShowSupportMenu(false); navigate(item.path); }}
+                    style={{
+                      width: '100%',
+                      background: 'none',
+                      border: 'none',
+                      textAlign: 'left',
+                      padding: '10px 16px',
+                      cursor: 'pointer',
+                      color: 'var(--text-main)',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      transition: 'background 0.15s, color 0.15s'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(193,38,50,0.06)'; e.currentTarget.style.color = 'var(--primary)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--text-main)'; }}
+                  >
+                    <span style={{ color: 'var(--primary)', opacity: 0.8 }}>{item.icon}</span>
+                    {item.label}
+                  </button>
+                ))}
               </div>
             )}
           </div>
