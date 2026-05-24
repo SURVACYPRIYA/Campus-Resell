@@ -37,6 +37,12 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    if (!email.endsWith('@anurag.edu.in')) {
+      setError('Only @anurag.edu.in emails are authorized.');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await login(email, password);

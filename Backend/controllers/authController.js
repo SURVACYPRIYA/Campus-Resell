@@ -20,12 +20,9 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Validate university email domain (example check)
-        const emailDomain = email.split('@')[1];
-        // In a real scenario, you'd check against a list of allowed domains
-        // For now, let's just ensure it's a valid domain format
-        if (!emailDomain.includes('.')) {
-            return res.status(400).json({ message: 'Please use a valid university email' });
+        // Validate university email domain
+        if (!email.endsWith('@anurag.edu.in')) {
+            return res.status(403).json({ message: 'Only @anurag.edu.in emails are authorized.' });
         }
 
         const user = await User.create({
@@ -60,6 +57,10 @@ exports.login = async (req, res) => {
         // 1) Check if email and password exist
         if (!email || !password) {
             return res.status(400).json({ message: 'Please provide email and password' });
+        }
+
+        if (!email.endsWith('@anurag.edu.in')) {
+            return res.status(403).json({ message: 'Only @anurag.edu.in emails are authorized.' });
         }
 
         // 2) Check if user exists && password is correct
@@ -139,6 +140,10 @@ exports.googleLogin = async (req, res) => {
             email = payload.email;
             name = payload.name;
             picture = payload.picture;
+        }
+
+        if (!email.endsWith('@anurag.edu.in')) {
+            return res.status(403).json({ message: 'Only @anurag.edu.in emails are authorized.' });
         }
 
         // Check if user exists
