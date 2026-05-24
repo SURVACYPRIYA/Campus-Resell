@@ -31,6 +31,8 @@ const Register = () => {
       }
     },
     onError: () => setError('Google registration failed'),
+    prompt: 'select_account',
+    auto_select: false,
   });
 
   const handleSubmit = async (e) => {

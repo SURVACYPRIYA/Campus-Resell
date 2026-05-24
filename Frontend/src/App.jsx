@@ -14,6 +14,9 @@ import Profile from './pages/Profile';
 import Story from './pages/Story';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
+import Dashboard from './pages/Dashboard';
+import MyListings from './pages/MyListings';
+import Purchases from './pages/Purchases';
 import { useAuth } from './context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import './index.css';
@@ -95,6 +98,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/my-listings" 
+              element={
+                <ProtectedRoute>
+                  <MyListings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/purchases" 
+              element={
+                <ProtectedRoute>
+                  <Purchases />
                 </ProtectedRoute>
               } 
             />

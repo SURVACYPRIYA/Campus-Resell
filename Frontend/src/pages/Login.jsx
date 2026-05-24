@@ -30,6 +30,8 @@ const Login = () => {
       }
     },
     onError: () => setError('Google login failed'),
+    prompt: 'select_account',
+    auto_select: false,
   });
 
   const handleSubmit = async (e) => {
