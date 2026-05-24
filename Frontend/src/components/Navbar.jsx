@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, MessageSquare, LogOut, PlusCircle, MoreVertical } from 'lucide-react';
+import { ShoppingBag, MessageSquare, LogOut, PlusCircle, MoreVertical, HelpCircle, BookOpen, Mail } from 'lucide-react';
+
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showSupportMenu, setShowSupportMenu] = useState(false);
+
   const menuItemStyle = {
     width: '100%',
     background: 'none',
@@ -124,9 +127,82 @@ const Navbar = () => {
           <Link to="/chat" className="nav-link" style={{ color: '#233559', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>
             <MessageSquare size={18} style={{ color: 'var(--primary)' }} /> <span>Chat</span>
           </Link>
-          <Link to="/story" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>About</Link>
-          <Link to="/faq" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>FAQ</Link>
-          <Link to="/contact" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>Contact</Link>
+          {/* Support Dropdown */}
+          <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+            <button
+              onClick={() => {
+                // close profile menu first to prevent overlap
+                setShowProfileMenu(false);
+                // toggle support menu using component state (handled below)
+                // eslint-disable-next-line no-undef
+                setShowSupportMenu(v => !v);
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#233559',
+                fontWeight: '600',
+                fontSize: '0.95rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: 0
+              }}
+              title="Support"
+            >
+              Support
+              <MoreVertical size={18} style={{ color: 'var(--primary)' }} />
+            </button>
+
+            {/** dropdown layer */}
+            {showSupportMenu && (
+              <div style={{
+                position: 'absolute',
+                top: '44px',
+                left: 0,
+                background: '#ffffff',
+                border: '1px solid var(--glass-border)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                zIndex: 1000,
+                minWidth: '180px'
+              }}>
+                <button
+                  onClick={() => {
+                    setShowSupportMenu(false);
+                    navigate('/story');
+                  }}
+                  style={{ ...menuItemStyle, display: 'flex', alignItems: 'center', gap: '10px' }}
+                >
+                  <BookOpen size={18} style={{ color: 'var(--primary)' }} />
+                  About
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSupportMenu(false);
+                    navigate('/faq');
+                  }}
+                  style={{ ...menuItemStyle, display: 'flex', alignItems: 'center', gap: '10px' }}
+                >
+                  <HelpCircle size={18} style={{ color: 'var(--primary)' }} />
+                  FAQ
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSupportMenu(false);
+                    navigate('/contact');
+                  }}
+                  style={{ ...menuItemStyle, display: 'flex', alignItems: 'center', gap: '10px' }}
+                >
+                  <Mail size={18} style={{ color: 'var(--primary)' }} />
+                  Contact
+                </button>
+
+              </div>
+            )}
+          </div>
+
           {user ? (
             <>
               <div style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', color: '#233559', padding: '4px 12px', background: 'rgba(35, 53, 89, 0.05)', borderRadius: '20px', border: '1px solid rgba(35, 53, 89, 0.1)', position: 'relative' }}>
