@@ -132,6 +132,9 @@ io.on('connection', (socket) => {
                         content:
                             populatedMessage.content,
 
+                        read:
+                            populatedMessage.read,
+
                         createdAt:
                             populatedMessage.createdAt
                     }

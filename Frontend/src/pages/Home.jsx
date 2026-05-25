@@ -132,54 +132,104 @@ const Home = () => {
           <section style={{ marginTop: '80px', textAlign: 'center' }}>
             <span style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Explore</span>
             <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '10px', marginBottom: '8px', color: '#233559' }}>Browse by Category</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '40px' }}>Find exactly what you need from our organized categories</p>
-            
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '45px' }}>Find exactly what you need from our organized categories</p>
+
+            <div className="cat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
               {[
-                { name: "Furniture", icon: <Armchair size={28} />, path: "/marketplace?category=Furniture" },
-                { name: "Electronics", icon: <Monitor size={28} />, path: "/marketplace?category=Electronics" },
-                { name: "Books", icon: <Book size={28} />, path: "/marketplace?category=Books" },
-                { name: "Appliances", icon: <Coffee size={28} />, path: "/marketplace?category=Appliances" },
-                { name: "Engineering", icon: <Settings size={28} />, path: "/marketplace?category=Engineering" },
-                { name: "Medical", icon: <Activity size={28} />, path: "/marketplace?category=Medical" },
-                { name: "Vehicles", icon: <Bike size={28} />, path: "/marketplace?category=Vehicles" },
-                { name: "Other", icon: <Package size={28} />, path: "/marketplace?category=Other" }
+                { name: "Furniture",   icon: <Armchair size={30} />, path: "/marketplace?category=Furniture",   gradient: "linear-gradient(135deg, #667eea, #764ba2)", items: "42+" },
+                { name: "Electronics", icon: <Monitor size={30} />,  path: "/marketplace?category=Electronics", gradient: "linear-gradient(135deg, #f093fb, #f5576c)", items: "78+" },
+                { name: "Books",       icon: <Book size={30} />,     path: "/marketplace?category=Books",       gradient: "linear-gradient(135deg, #4facfe, #00f2fe)", items: "120+" },
+                { name: "Appliances",  icon: <Coffee size={30} />,   path: "/marketplace?category=Appliances",  gradient: "linear-gradient(135deg, #43e97b, #38f9d7)", items: "35+" },
+                { name: "Engineering", icon: <Settings size={30} />, path: "/marketplace?category=Engineering", gradient: "linear-gradient(135deg, #fa709a, #fee140)", items: "56+" },
+                { name: "Medical",     icon: <Activity size={30} />, path: "/marketplace?category=Medical",     gradient: "linear-gradient(135deg, #a18cd1, #fbc2eb)", items: "28+" },
+                { name: "Vehicles",    icon: <Bike size={30} />,     path: "/marketplace?category=Vehicles",    gradient: "linear-gradient(135deg, #fccb90, #d57eeb)", items: "15+" },
+                { name: "Other",       icon: <Package size={30} />,  path: "/marketplace?category=Other",       gradient: "linear-gradient(135deg, #89f7fe, #66a6ff)", items: "60+" }
               ].map((cat, i) => (
                 <Link key={i} to={cat.path} style={{ textDecoration: 'none' }}>
-                  <motion.div 
-                    whileHover={{ y: -5, boxShadow: '0 12px 28px rgba(0,0,0,0.08)' }}
-                    className="glass-card"
-                    style={{ 
-                      width: '130px', 
-                      height: '130px', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      alignItems: 'center', 
-                      justifyContent: 'center', 
-                      gap: '15px',
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: i * 0.06 }}
+                    whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
+                    style={{
+                      background: '#ffffff',
+                      borderRadius: '20px',
+                      padding: '28px 20px 24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '14px',
                       cursor: 'pointer',
-                      border: '1px solid var(--glass-border)',
-                      borderRadius: '16px'
+                      border: '1px solid #e8ecf3',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--primary)';
-                      e.currentTarget.style.background = 'rgba(193, 38, 50, 0.02)';
-                      e.currentTarget.querySelector('.cat-icon').style.color = 'var(--primary)';
+                      e.currentTarget.style.borderColor = 'transparent';
+                      e.currentTarget.querySelector('.cat-glow').style.opacity = '1';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--glass-border)';
-                      e.currentTarget.style.background = '#ffffff';
-                      e.currentTarget.querySelector('.cat-icon').style.color = '#64748b';
+                      e.currentTarget.style.borderColor = '#e8ecf3';
+                      e.currentTarget.querySelector('.cat-glow').style.opacity = '0';
                     }}
                   >
-                    <div className="cat-icon" style={{ color: '#64748b', transition: 'color 0.2s' }}>
+                    {/* Background glow on hover */}
+                    <div className="cat-glow" style={{
+                      position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%',
+                      background: cat.gradient, opacity: 0, transition: 'opacity 0.4s',
+                      filter: 'blur(60px)', pointerEvents: 'none', zIndex: 0
+                    }} />
+
+                    {/* Icon circle */}
+                    <div style={{
+                      width: '64px', height: '64px', borderRadius: '18px',
+                      background: cat.gradient,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#ffffff', position: 'relative', zIndex: 1,
+                      boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
+                    }}>
                       {cat.icon}
                     </div>
-                    <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)' }}>{cat.name}</span>
+
+                    {/* Name */}
+                    <span style={{
+                      fontSize: '1.05rem', fontWeight: '700', color: '#233559',
+                      position: 'relative', zIndex: 1
+                    }}>
+                      {cat.name}
+                    </span>
+
+                    {/* Item count */}
+                    <span style={{
+                      fontSize: '0.78rem', fontWeight: '600', color: 'var(--text-muted)',
+                      background: '#f1f5f9', padding: '3px 12px', borderRadius: '20px',
+                      position: 'relative', zIndex: 1
+                    }}>
+                      {cat.items} items
+                    </span>
+
+                    {/* Arrow indicator */}
+                    <div style={{
+                      position: 'relative', zIndex: 1, marginTop: '2px',
+                      color: 'var(--text-muted)', transition: 'color 0.2s'
+                    }}>
+                      <ArrowRight size={16} />
+                    </div>
                   </motion.div>
                 </Link>
               ))}
             </div>
+
+            <style>{`
+              @media (max-width: 900px) {
+                .cat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+              }
+              @media (max-width: 500px) {
+                .cat-grid { grid-template-columns: 1fr !important; }
+              }
+            `}</style>
           </section>
 
           {/* CAMPUS STATS */}

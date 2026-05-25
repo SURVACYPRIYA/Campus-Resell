@@ -223,24 +223,96 @@ const Navbar = () => {
 
           {user ? (
             <>
-              <div style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', color: '#233559', padding: '4px 12px', background: 'rgba(35, 53, 89, 0.05)', borderRadius: '20px', border: '1px solid rgba(35, 53, 89, 0.1)', position: 'relative' }}>
-                 <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8b1a25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                   <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'white', userSelect: 'none' }}>{user.name?.charAt(0)?.toUpperCase()}</span>
-                 </div>
-                 <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>{displayName}</span>
-                 <button onClick={() => setShowProfileMenu(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }} title="Menu">
-                   <MoreVertical size={18} />
-                 </button>
-                 {showProfileMenu && (
-                   <div style={{ position: 'absolute', top: '44px', right: 0, background: '#ffffff', border: '1px solid var(--glass-border)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 1000, minWidth: '160px' }}>
-                     <button onClick={() => { setShowProfileMenu(false); navigate('/dashboard'); }} style={menuItemStyle}>🏠 Dashboard</button>
-                     <button onClick={() => { setShowProfileMenu(false); navigate('/my-listings'); }} style={menuItemStyle}>📦 My Listings</button>
-                     <button onClick={() => { setShowProfileMenu(false); navigate('/purchases'); }} style={menuItemStyle}>🛍️ Purchases</button>
-                     <hr style={{ margin: '4px 0', border: 'none', borderTop: '1px solid #e2e8f0' }} />
-                     <button onClick={() => { setShowProfileMenu(false); if (window.confirm('Are you sure you want to logout?')) logout(); }} style={{ ...menuItemStyle, color: '#ef4444' }}>🚪 Logout</button>
+              <div style={{ position: 'relative', display: 'inline-flex' }}>
+                <button 
+                  onClick={() => { setShowSupportMenu(false); setShowProfileMenu(v => !v); }}
+                  style={{
+                    background: showProfileMenu ? 'rgba(35,53,89,0.08)' : 'rgba(35, 53, 89, 0.03)',
+                    border: '1.5px solid',
+                    borderColor: showProfileMenu ? 'rgba(35,53,89,0.2)' : 'rgba(35, 53, 89, 0.1)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '4px 14px 4px 6px',
+                    borderRadius: '30px',
+                    transition: 'all 0.2s ease',
+                    outline: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!showProfileMenu) {
+                      e.currentTarget.style.background = 'rgba(35,53,89,0.06)';
+                      e.currentTarget.style.borderColor = 'rgba(35,53,89,0.15)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!showProfileMenu) {
+                      e.currentTarget.style.background = 'rgba(35, 53, 89, 0.03)';
+                      e.currentTarget.style.borderColor = 'rgba(35, 53, 89, 0.1)';
+                    }
+                  }}
+                  title="Profile Menu"
+                >
+                   <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8b1a25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 4px rgba(193,38,50,0.2)' }}>
+                     <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'white', userSelect: 'none' }}>{user.name?.charAt(0)?.toUpperCase()}</span>
                    </div>
-                 )}
-               </div>
+                   <span style={{ fontSize: '0.9rem', fontWeight: '600', color: '#233559' }}>{displayName}</span>
+                   <ChevronDown size={14} style={{ color: '#233559', transition: 'transform 0.2s', transform: showProfileMenu ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                </button>
+                {showProfileMenu && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '50px',
+                    right: 0,
+                    background: '#ffffff',
+                    border: '1px solid var(--glass-border)',
+                    borderRadius: '14px',
+                    boxShadow: '0 8px 32px rgba(35,53,89,0.12), 0 2px 8px rgba(0,0,0,0.06)',
+                    zIndex: 1000,
+                    minWidth: '200px',
+                    overflow: 'hidden',
+                    padding: '8px 0'
+                  }}>
+                    <div style={{ padding: '6px 16px 10px', borderBottom: '1px solid #f1f5f9', marginBottom: '4px' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--primary)' }}>My Account</span>
+                    </div>
+                    {[
+                      { icon: '🏠', label: 'Dashboard', path: '/dashboard' },
+                      { icon: '📦', label: 'My Listings', path: '/my-listings' },
+                      { icon: '🛍️', label: 'Purchases', path: '/purchases' },
+                    ].map((item) => (
+                      <button
+                        key={item.path}
+                        onClick={() => { setShowProfileMenu(false); navigate(item.path); }}
+                        style={{
+                          width: '100%', background: 'none', border: 'none', textAlign: 'left',
+                          padding: '10px 16px', cursor: 'pointer', color: 'var(--text-main)',
+                          fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '12px',
+                          transition: 'background 0.15s'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(35,53,89,0.04)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+                      >
+                        <span style={{ opacity: 0.8 }}>{item.icon}</span> {item.label}
+                      </button>
+                    ))}
+                    <hr style={{ margin: '4px 0', border: 'none', borderTop: '1px solid #e2e8f0' }} />
+                    <button
+                      onClick={() => { setShowProfileMenu(false); if (window.confirm('Are you sure you want to logout?')) logout(); }}
+                      style={{
+                        width: '100%', background: 'none', border: 'none', textAlign: 'left',
+                        padding: '10px 16px', cursor: 'pointer', color: '#ef4444',
+                        fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '12px',
+                        transition: 'background 0.15s'
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.05)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+                    >
+                      <span>🚪</span> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>

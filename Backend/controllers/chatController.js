@@ -9,12 +9,22 @@ exports.getChats = async (req, res) => {
         .populate('participants', 'name avatar')
         .populate('product', 'title images price')
         .populate('lastMessage')
-        .sort('-updatedAt');
+        .sort('-updatedAt')
+        .lean();
+
+        const chatsWithUnread = await Promise.all(chats.map(async (chat) => {
+            const unreadCount = await Message.countDocuments({
+                chat: chat._id,
+                sender: { $ne: req.user._id },
+                read: false
+            });
+            return { ...chat, unreadCount };
+        }));
 
         res.status(200).json({
             status: 'success',
-            results: chats.length,
-            data: { chats }
+            results: chatsWithUnread.length,
+            data: { chats: chatsWithUnread }
         });
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -107,6 +117,27 @@ exports.getInterestedBuyers = async (req, res) => {
             status: 'success',
             data: { buyers: uniqueBuyers }
         });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+exports.markAsRead = async (req, res) => {
+    try {
+        const { chatId } = req.params;
+        
+        const chat = await Chat.findById(chatId);
+        if (!chat) return res.status(404).json({ message: 'Chat not found' });
+        
+        const isParticipant = chat.participants.some(id => id.toString() === req.user._id.toString());
+        if (!isParticipant) return res.status(403).json({ message: 'Unauthorized' });
+
+        await Message.updateMany(
+            { chat: chatId, sender: { $ne: req.user._id }, read: false },
+            { read: true }
+        );
+
+        res.status(200).json({ status: 'success' });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

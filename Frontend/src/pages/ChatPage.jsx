@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import React, {
   useState,
   useEffect,
@@ -136,10 +136,24 @@ const ChatPage = () => {
     socket.on('receive_message', (data) => {
       if (activeChat && data.chatId === activeChat._id) {
         setMessages((prev) => [...prev, data]);
+        // Mark as read immediately if it's the active chat and not my message
+        if (data.sender._id !== user._id) {
+           axios.post(`/api/chats/${data.chatId}/read`, {}, {
+             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+           }).catch(console.error);
+        }
+      } else {
+        // Increment unread count for the background chat
+        setChats(prevChats => prevChats.map(c => 
+          c._id === data.chatId ? { ...c, unreadCount: (c.unreadCount || 0) + 1 } : c
+        ));
+        // Show toast notification
+        toast.success(`New message from ${data.sender?.name || 'Someone'}`);
+
       }
     });
     return () => { socket.off('receive_message'); };
-  }, [activeChat]);
+  }, [activeChat, user]);
 
   // AUTO-OPEN CHAT FROM PRODUCT PAGE (fires only once)
   useEffect(() => {
@@ -161,6 +175,16 @@ const ChatPage = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setMessages(res.data.data.messages);
+
+      // Clear unread count locally and mark as read in DB
+      if (chat.unreadCount > 0) {
+        setChats(prevChats => prevChats.map(c => 
+          c._id === chat._id ? { ...c, unreadCount: 0 } : c
+        ));
+        await axios.post(`/api/chats/${chat._id}/read`, {}, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        }).catch(err => console.error('Failed to mark as read', err));
+      }
     } catch (err) {
       console.error(err);
     }
@@ -203,12 +227,14 @@ const ChatPage = () => {
     );
 
   return (
-    <div style={{
-      height: 'calc(100vh - 80px)',
-      display: 'flex',
-      background: 'var(--bg)',
-      fontFamily: "'Segoe UI', sans-serif",
-      overflow: 'hidden'
+    <>
+      <Toaster position="top-right" toastOptions={{ duration: 20000, style: { fontFamily: "'Segoe UI', sans-serif", fontSize: '0.9rem' } }} />
+      <div style={{
+        height: 'calc(100vh - 80px)',
+        display: 'flex',
+        background: 'var(--bg)',
+        fontFamily: "'Segoe UI', sans-serif",
+        overflow: 'hidden'
     }}>
 
       {/* ── SIDEBAR ── */}
@@ -288,6 +314,15 @@ const ChatPage = () => {
                       {chat.product?.title || 'Product Chat'}
                     </p>
                   </div>
+                  {/* UNREAD BADGE */}
+                  {chat.unreadCount > 0 && (
+                    <div style={{
+                      background: '#16a34a', color: 'white', fontSize: '0.75rem', fontWeight: 'bold',
+                      minWidth: '22px', height: '22px', borderRadius: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px', flexShrink: 0
+                    }}>
+                      {chat.unreadCount}
+                    </div>
+                  )}
                 </div>
               );
             })
@@ -602,7 +637,8 @@ const ChatPage = () => {
         </div>
       )}
 
-    </div>
+      </div>
+    </>
   );
 };
 
