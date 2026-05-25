@@ -17,6 +17,7 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 // CONNECT DATABASE
 connectDB();
@@ -55,6 +56,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/chats', chatRoutes);
 
 app.use('/api/reports', reportRoutes);
+
+app.use('/api/users', userRoutes);
 
 // TEST ROUTE
 app.get('/', (req, res) => {

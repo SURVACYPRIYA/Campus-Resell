@@ -11,6 +11,7 @@ router.use(protect); // Protect all routes below
 
 router.post('/', productController.createProduct);
 router.patch('/:id', productController.updateProduct);
+router.post('/:id/review', productController.addReview);
 router.delete('/:id', productController.deleteProduct);
 
 module.exports = router;

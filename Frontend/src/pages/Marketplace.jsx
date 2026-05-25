@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import axios from '../axios';
 import { Search, Loader2, Share2 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+
 import { useAuth } from '../context/AuthContext';
 
 const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3e%3crect width='800' height='600' fill='%23f1f5f9'/%3e%3cg transform='translate(360, 260)'%3e%3csvg width='80' height='80' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3e%3crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3e%3ccircle cx='8.5' cy='8.5' r='1.5'/%3e%3cpolyline points='21 15 16 10 5 21'/%3e%3c/svg%3e%3c/g%3e%3c/svg%3e";
@@ -15,16 +17,28 @@ const Marketplace = () => {
 
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  // Category tabs shown on Marketplace.
+  // Backend schema enum is: Books | Cycles | Electronics | Others
   const categories = ['All', 'Books', 'Cycles', 'Electronics', 'Others'];
+
+  // If the URL param isn't one of the supported backend categories, fallback to All.
+  const normalizedCategory = categories.includes(category) ? category : 'All';
+
+
+
+
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       let url = `/api/products?`;
-      if (category !== 'All') {
-        url += `category=${category}&`;
+      if (normalizedCategory && normalizedCategory !== 'All') {
+        url += `category=${encodeURIComponent(normalizedCategory)}&`;
       }
+
+
       if (searchTerm) {
         url += `search=${searchTerm}&`;
       }
@@ -37,9 +51,29 @@ const Marketplace = () => {
     }
   };
 
+  // Sync selected category with homepage query param: /marketplace?category=Electronics
+  useEffect(() => {
+    const qpCategory = searchParams.get('category');
+    if (qpCategory && qpCategory !== category) {
+      setCategory(qpCategory);
+    }
+
+    const qpSearch = searchParams.get('search');
+
+    if (qpSearch && qpSearch !== searchTerm) {
+      setSearchTerm(qpSearch);
+    }
+
+    if (!qpCategory && category !== 'All') {
+      setCategory('All');
+    }
+  }, [searchParams]);
+
+
   useEffect(() => {
     fetchProducts();
   }, [category, searchTerm]);
+
 
   const handleShare = (product) => {
     const url = `${window.location.origin}/product/${product._id}`;
@@ -51,7 +85,7 @@ const Marketplace = () => {
       }).catch((err) => console.error('Share failed', err));
     } else {
       navigator.clipboard.writeText(url);
-      alert('Link copied to clipboard!');
+      toast.success('Link copied to clipboard!');
     }
   };
 
@@ -74,8 +108,18 @@ const Marketplace = () => {
         {/* CATEGORY FILTERS */}
         <div style={{ display: 'flex', gap: '15px', overflowX: 'auto', paddingBottom: '5px' }}>
           {categories.map((cat) => (
-            <button key={cat} onClick={() => setCategory(cat)} style={{
+            <button
+              key={cat}
+              onClick={() => {
+                setCategory(cat);
+                const next = new URLSearchParams(searchParams);
+                if (cat === 'All') next.delete('category');
+                else next.set('category', cat);
+                setSearchParams(next, { replace: true });
+              }}
+              style={{
               padding: '8px 20px',
+
               borderRadius: '20px',
               border: category === cat ? '1px solid var(--primary)' : '1px solid var(--glass-border)',
               background: category === cat ? 'var(--primary)' : '#ffffff',

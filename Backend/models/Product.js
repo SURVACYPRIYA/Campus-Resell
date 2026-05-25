@@ -36,6 +36,15 @@ const productSchema = new mongoose.Schema({
     buyer: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
+    },
+    rating: {
+        type: Number,
+        min: 1,
+        max: 5
+    },
+    reviewText: {
+        type: String,
+        trim: true
     }
 }, {
     timestamps: true

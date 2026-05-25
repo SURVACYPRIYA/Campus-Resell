@@ -135,9 +135,16 @@ const Purchases = () => {
                 <span style={{ fontSize: '1.3rem', fontWeight: 800, color: '#f59e0b' }}>
                   ₹{Number(product.price).toLocaleString('en-IN')}
                 </span>
-                <Link to={`/product/${product._id}`} className="btn-primary" style={{ padding: '6px 16px', fontSize: '0.85rem' }}>
-                  View
-                </Link>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {!product.rating && (
+                    <Link to={`/product/${product._id}`} style={{ padding: '6px 12px', fontSize: '0.85rem', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '8px', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Star size={14} /> Rate Seller
+                    </Link>
+                  )}
+                  <Link to={`/product/${product._id}`} className="btn-primary" style={{ padding: '6px 16px', fontSize: '0.85rem' }}>
+                    View
+                  </Link>
+                </div>
               </div>
             </div>
           ))}

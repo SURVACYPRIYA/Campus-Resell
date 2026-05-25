@@ -1,4 +1,5 @@
 import React from 'react';
+import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 
@@ -84,7 +85,7 @@ const Contact = () => {
           style={{ padding: '40px' }}
         >
           <h2 style={{ fontSize: '1.8rem', marginBottom: '20px', color: '#233559' }}>Send a Message</h2>
-          <form onSubmit={(e) => { e.preventDefault(); alert('Message sent successfully! We will get back to you soon.'); }}>
+          <form onSubmit={(e) => { e.preventDefault(); toast.success('Message sent successfully! We will get back to you soon.'); }}>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontWeight: '600' }}>Your Name</label>
               <input type="text" className="input-glass" placeholder="John Doe" required />

@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react';
 import axios from '../axios';
 import { useAuth } from '../context/AuthContext';
@@ -58,10 +59,10 @@ const Profile = () => {
         }
       });
       setProducts((prev) => prev.filter((p) => p._id !== productId));
-      alert('Listing deleted successfully!');
+      toast.error('Listing deleted successfully!');
     } catch (err) {
       console.error('Error deleting product:', err);
-      alert(err.response?.data?.message || 'Failed to delete listing');
+      toast.error(err.response?.data?.message || 'Failed to delete listing');
     }
   };
 

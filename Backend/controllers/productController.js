@@ -146,3 +146,37 @@ exports.deleteProduct = async (req, res) => {
     }
 };
 
+exports.addReview = async (req, res) => {
+    try {
+        const { rating, reviewText } = req.body;
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Verify the product is sold and the current user is the buyer
+        if (product.status !== 'sold' || !product.buyer) {
+            return res.status(400).json({ message: 'Product has not been sold yet' });
+        }
+
+        if (product.buyer.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Only the buyer can review this product' });
+        }
+
+        // Add the review
+        product.rating = Number(rating);
+        if (reviewText) {
+            product.reviewText = reviewText;
+        }
+
+        await product.save({ validateBeforeSave: false });
+
+        res.status(200).json({
+            status: 'success',
+            data: { product }
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

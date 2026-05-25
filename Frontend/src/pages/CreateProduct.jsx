@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import axios from '../axios';
 import { IndianRupee, Tag, Loader2, X, Camera, ImagePlus, Link, ZoomIn } from 'lucide-react';
@@ -172,7 +173,7 @@ const CreateProduct = () => {
     setLoading(true);
 
     if (imageFiles.length === 0 && !formData.imageUrl) {
-      alert('Please provide at least one product image (photo or link).');
+      toast('Please provide at least one product image (photo or link).');
       setLoading(false);
       return;
     }
@@ -193,7 +194,7 @@ const CreateProduct = () => {
       navigate('/marketplace');
     } catch (err) {
       console.error(err);
-      alert('Failed to create listing');
+      toast.error('Failed to create listing');
     } finally {
       setLoading(false);
     }

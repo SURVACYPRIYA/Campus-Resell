@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { MessageSquare, X, Send, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -9,7 +10,7 @@ const FeedbackModal = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Thank you for your feedback!');
+    toast.success('Thank you for your feedback!');
     setIsOpen(false);
     setRating(0);
   };

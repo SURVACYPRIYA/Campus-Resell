@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -36,7 +37,7 @@ const MyListings = () => {
       });
       setProducts(prev => prev.filter(p => p._id !== id));
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete');
+      toast.error(err.response?.data?.message || 'Failed to delete');
     }
   };
 

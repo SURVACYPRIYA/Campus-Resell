@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CameraModal from '../components/CameraModal';
+import toast from 'react-hot-toast';
 
 const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3e%3crect width='800' height='600' fill='%23f1f5f9'/%3e%3cg transform='translate(360, 260)'%3e%3csvg width='80' height='80' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3e%3crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3e%3ccircle cx='8.5' cy='8.5' r='1.5'/%3e%3cpolyline points='21 15 16 10 5 21'/%3e%3c/svg%3e%3c/g%3e%3c/svg%3e";
 
@@ -38,6 +39,12 @@ const ProductDetails = () => {
   const [interestedBuyers, setInterestedBuyers] = useState([]);
 
   const isSeller = user && product && product.seller && user._id === product.seller._id;
+  const isBuyer = user && product && product.buyer && user._id === product.buyer;
+
+  const [sellerRating, setSellerRating] = useState(null);
+  const [ratingInput, setRatingInput] = useState(0);
+  const [reviewTextInput, setReviewTextInput] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const handleUpdatePhoto = (file) => {
     const reader = new FileReader();
@@ -52,10 +59,10 @@ const ProductDetails = () => {
         );
         setProduct(res.data.data.product);
         setShowCamera(false);
-        alert('Photo updated successfully!');
+        toast.success('Photo updated successfully!');
       } catch (err) {
         console.error('Error updating photo:', err);
-        alert('Failed to update photo');
+        toast.error('Failed to update photo');
       }
     };
   };
@@ -75,6 +82,14 @@ const ProductDetails = () => {
 
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (product?.seller?._id) {
+      axios.get(`/api/users/${product.seller._id}/rating`)
+        .then(res => setSellerRating(res.data.data))
+        .catch(err => console.error('Failed to fetch seller rating', err));
+    }
+  }, [product?.seller?._id, product?.rating]);
 
   useEffect(() => {
     if (product && !isEditing) {
@@ -101,17 +116,33 @@ const ProductDetails = () => {
     }
   }, [product, isEditing, isSeller]);
 
+  const submitReview = async () => {
+    if (ratingInput === 0) return toast.error('Please select a star rating');
+    setIsSubmittingReview(true);
+    try {
+      const res = await axios.post(`/api/products/${product._id}/review`, { rating: ratingInput, reviewText: reviewTextInput }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      setProduct(res.data.data.product);
+      toast.success('Review submitted successfully!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to submit review');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
   const handleSaveChanges = async () => {
     if (!editTitle.trim()) {
-      alert('Title cannot be empty');
+      toast.error('Title cannot be empty');
       return;
     }
     if (!editPrice || Number(editPrice) <= 0) {
-      alert('Price must be a positive number');
+      toast.error('Price must be a positive number');
       return;
     }
     if (!editDescription.trim()) {
-      alert('Description cannot be empty');
+      toast.error('Description cannot be empty');
       return;
     }
 
@@ -125,7 +156,7 @@ const ProductDetails = () => {
           price: Number(editPrice),
           description: editDescription,
           status: editStatus,
-          buyer: editStatus === 'sold' ? editBuyer : null
+          buyer: (editStatus === 'sold' && editBuyer) ? editBuyer : null
         },
         {
           headers: {
@@ -135,10 +166,10 @@ const ProductDetails = () => {
       );
       setProduct(res.data.data.product);
       setIsEditing(false);
-      alert('Listing updated successfully!');
+      toast.success('Listing updated successfully!');
     } catch (err) {
       console.error('Error saving product changes:', err);
-      alert(err.response?.data?.message || 'Failed to save changes');
+      toast.error(err.response?.data?.message || 'Failed to save changes');
     } finally {
       setSaving(false);
     }
@@ -195,7 +226,7 @@ const ProductDetails = () => {
         }
       );
 
-      alert('Report submitted successfully.');
+      toast.success('Report submitted successfully.');
     } catch (err) {
       console.error(err);
     }
@@ -215,7 +246,7 @@ const ProductDetails = () => {
       }
     } else {
       navigator.clipboard.writeText(url);
-      alert('Link copied to clipboard!');
+      toast.success('Link copied to clipboard!');
     }
   };
 
@@ -377,7 +408,7 @@ const ProductDetails = () => {
                       <option value="sold">Sold</option>
                     </select>
                   </div>
-                  {editStatus === 'sold' && (
+                  {editStatus?.toLowerCase() === 'sold' && (
                     <div style={{ flex: 1, minWidth: '120px' }}>
                       <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '5px' }}>Buyer (Optional)</label>
                       <select
@@ -580,8 +611,102 @@ const ProductDetails = () => {
               >
                 Student Seller
               </p>
+              {sellerRating && sellerRating.totalRatings > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', color: '#f59e0b', fontWeight: 'bold', marginTop: '4px' }}>
+                  ⭐ {sellerRating.averageRating} ({sellerRating.totalRatings} ratings)
+                </div>
+              )}
             </div>
           </div>
+
+          {/* BUYER REVIEW SECTION */}
+          {isBuyer && product.status === 'sold' && (
+            <div style={{ marginBottom: '40px', padding: '20px', background: 'rgba(245,158,11,0.05)', borderRadius: '12px', border: '1px solid rgba(245,158,11,0.2)' }}>
+              <h4 style={{ marginBottom: '10px', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                ⭐ Rate Seller
+              </h4>
+              {product.rating ? (
+                <div>
+                  <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star} style={{ color: star <= product.rating ? '#f59e0b' : '#cbd5e1', fontSize: '1.2rem' }}>★</span>
+                    ))}
+                  </div>
+                  {product.reviewText && <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontStyle: 'italic' }}>"{product.reviewText}"</p>}
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>You have rated this seller.</p>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '15px' }}>How was your experience buying from {product.seller.name}?</p>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '15px' }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setRatingInput(star)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: star <= ratingInput ? '#f59e0b' : '#cbd5e1',
+                          fontSize: '1.5rem',
+                          cursor: 'pointer',
+                          transition: 'transform 0.1s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    placeholder="Leave an optional review..."
+                    value={reviewTextInput}
+                    onChange={(e) => setReviewTextInput(e.target.value)}
+                    className="input-glass"
+                    style={{ width: '100%', minHeight: '80px', padding: '10px', marginBottom: '15px', resize: 'vertical' }}
+                  />
+                  <button onClick={submitReview} disabled={isSubmittingReview || ratingInput === 0} className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.9rem' }}>
+                    {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SELLER REVIEWS SECTION */}
+          {sellerRating && sellerRating.reviews && sellerRating.reviews.length > 0 && (
+            <div style={{ marginTop: '20px', marginBottom: '40px' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '20px', color: '#233559' }}>
+                Reviews for {product.seller.name}
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {sellerRating.reviews.map(review => (
+                  <div key={review._id} style={{ padding: '20px', background: 'rgba(255,255,255,0.6)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8b1a25)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                          {review.buyer?.name?.charAt(0)?.toUpperCase() || '?'}
+                        </div>
+                        <div>
+                          <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 'bold', color: '#233559' }}>{review.buyer?.name || 'Anonymous'}</p>
+                          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>Bought: {review.title}</p>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '2px' }}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <span key={star} style={{ color: star <= review.rating ? '#f59e0b' : '#cbd5e1', fontSize: '1rem' }}>★</span>
+                        ))}
+                      </div>
+                    </div>
+                    {review.reviewText && (
+                      <p style={{ margin: '10px 0 0', fontSize: '0.95rem', color: 'var(--text-main)', lineHeight: '1.5' }}>"{review.reviewText}"</p>
+                    )}
+                    <p style={{ margin: '10px 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(review.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* CHAT / CONNECT BUTTON / OWNER EDIT CONTROLS */}
           {isSeller ? (

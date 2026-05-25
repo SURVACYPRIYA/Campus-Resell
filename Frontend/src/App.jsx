@@ -39,11 +39,14 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+import { Toaster } from 'react-hot-toast';
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="app-container">
+        <Toaster position="top-center" />
         <Navbar />
         <main className="main-content">
           <Routes>

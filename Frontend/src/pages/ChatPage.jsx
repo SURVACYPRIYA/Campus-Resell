@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import React, {
   useState,
   useEffect,
@@ -83,7 +84,7 @@ const ChatPage = () => {
   const handleMicClick = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert('Speech recognition is not supported in your browser. Try Chrome.');
+      toast('Speech recognition is not supported in your browser. Try Chrome.');
       return;
     }
 
@@ -174,7 +175,7 @@ const ChatPage = () => {
       setChats((prev) => prev.filter((c) => c._id !== chatId));
       if (activeChat?._id === chatId) { setActiveChat(null); setMessages([]); }
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete conversation');
+      toast.error(err.response?.data?.message || 'Failed to delete conversation');
     }
   };
 
