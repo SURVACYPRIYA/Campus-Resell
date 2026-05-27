@@ -136,14 +136,10 @@ const Home = () => {
 
             <div className="cat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
               {[
-                { name: "Furniture",   icon: <Armchair size={30} />, path: "/marketplace?category=Furniture",   gradient: "linear-gradient(135deg, #667eea, #764ba2)", items: "42+" },
-                { name: "Electronics", icon: <Monitor size={30} />,  path: "/marketplace?category=Electronics", gradient: "linear-gradient(135deg, #f093fb, #f5576c)", items: "78+" },
                 { name: "Books",       icon: <Book size={30} />,     path: "/marketplace?category=Books",       gradient: "linear-gradient(135deg, #4facfe, #00f2fe)", items: "120+" },
-                { name: "Appliances",  icon: <Coffee size={30} />,   path: "/marketplace?category=Appliances",  gradient: "linear-gradient(135deg, #43e97b, #38f9d7)", items: "35+" },
-                { name: "Engineering", icon: <Settings size={30} />, path: "/marketplace?category=Engineering", gradient: "linear-gradient(135deg, #fa709a, #fee140)", items: "56+" },
-                { name: "Medical",     icon: <Activity size={30} />, path: "/marketplace?category=Medical",     gradient: "linear-gradient(135deg, #a18cd1, #fbc2eb)", items: "28+" },
-                { name: "Vehicles",    icon: <Bike size={30} />,     path: "/marketplace?category=Vehicles",    gradient: "linear-gradient(135deg, #fccb90, #d57eeb)", items: "15+" },
-                { name: "Other",       icon: <Package size={30} />,  path: "/marketplace?category=Other",       gradient: "linear-gradient(135deg, #89f7fe, #66a6ff)", items: "60+" }
+                { name: "Electronics", icon: <Monitor size={30} />,  path: "/marketplace?category=Electronics", gradient: "linear-gradient(135deg, #f093fb, #f5576c)", items: "78+" },
+                { name: "Cycles",      icon: <Bike size={30} />,     path: "/marketplace?category=Cycles",      gradient: "linear-gradient(135deg, #43e97b, #38f9d7)", items: "35+" },
+                { name: "Others",      icon: <Package size={30} />,  path: "/marketplace?category=Others",      gradient: "linear-gradient(135deg, #89f7fe, #66a6ff)", items: "60+" }
               ].map((cat, i) => (
                 <Link key={i} to={cat.path} style={{ textDecoration: 'none' }}>
                   <motion.div
