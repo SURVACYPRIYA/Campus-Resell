@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageSquare, PlusCircle, MoreVertical, HelpCircle, BookOpen, Mail, ChevronDown, LifeBuoy } from 'lucide-react';
-
+import { MessageSquare, PlusCircle, HelpCircle, BookOpen, Mail, ChevronDown, LifeBuoy } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { globalUnread } = useNotification();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSupportMenu, setShowSupportMenu] = useState(false);
@@ -124,8 +125,33 @@ const Navbar = () => {
           <Link to="/sell" className="nav-link" style={{ color: '#233559', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>
             <PlusCircle size={18} style={{ color: 'var(--primary)' }} /> <span>Sell</span>
           </Link>
-          <Link to="/chat" className="nav-link" style={{ color: '#233559', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>
-            <MessageSquare size={18} style={{ color: 'var(--primary)' }} /> <span>Chat</span>
+          <Link to="/chat" className="nav-link" style={{ position: 'relative', color: '#233559', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <MessageSquare size={18} style={{ color: 'var(--primary)' }} />
+              {globalUnread > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-6px',
+                  right: '-8px',
+                  background: '#16a34a',
+                  color: 'white',
+                  fontSize: '0.65rem',
+                  fontWeight: 'bold',
+                  minWidth: '16px',
+                  height: '16px',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0 4px',
+                  border: '1.5px solid #ffffff',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                }}>
+                  {globalUnread > 99 ? '99+' : globalUnread}
+                </span>
+              )}
+            </div>
+            <span>Chat</span>
           </Link>
           {/* Support Dropdown */}
           <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>

@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 
 import axios from '../axios';
 
-import io from 'socket.io-client';
+import socket from '../socket';
 
 import {
   Send,
@@ -21,12 +21,7 @@ import {
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
-
-// SOCKET CONNECTION
-const socket = io(
-  import.meta.env.VITE_API_URL ||
-  'http://localhost:5000'
-);
+import { useNotification } from '../context/NotificationContext';
 
 // Subtle neutral pattern for messages background
 const chatBg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23f8fafc'/%3E%3Cg opacity='0.08' fill='none' stroke='%2394a3b8' stroke-width='1'%3E%3Ccircle cx='20' cy='20' r='8'/%3E%3Ccircle cx='60' cy='60' r='8'/%3E%3Crect x='70' y='10' width='16' height='16' rx='3'/%3E%3Crect x='10' y='70' width='16' height='16' rx='3'/%3E%3Cpath d='M40 5 L45 15 L55 15 L47 22 L50 32 L40 26 L30 32 L33 22 L25 15 L35 15 Z'/%3E%3C/g%3E%3C/svg%3E")`;
@@ -34,6 +29,7 @@ const chatBg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg
 const ChatPage = () => {
 
   const { user } = useAuth();
+  const { markRead } = useNotification();
   const location = useLocation();
 
   const [chats, setChats] = useState([]);
@@ -144,6 +140,7 @@ const ChatPage = () => {
         // Mark as read immediately if it's the active chat and not my message
         if (data.sender._id !== user._id) {
            axios.post(`/api/chats/${data.chatId}/read`).catch(console.error);
+           markRead(1);
         }
       } else {
         // Show toast notification
@@ -156,7 +153,10 @@ const ChatPage = () => {
         const chatIndex = updatedChats.findIndex(c => c._id === data.chatId);
         
         if (chatIndex > -1) {
-          const chatToUpdate = updatedChats.splice(chatIndex, 1)[0];
+          // Create a shallow copy of the chat to avoid mutating state directly (fixes StrictMode double-increment)
+          const chatToUpdate = { ...updatedChats[chatIndex] };
+          updatedChats.splice(chatIndex, 1);
+          
           chatToUpdate.lastMessage = data;
           
           if (data.sender._id !== user._id && (!activeChat || activeChat._id !== data.chatId)) {
@@ -196,6 +196,7 @@ const ChatPage = () => {
           c._id === chat._id ? { ...c, unreadCount: 0 } : c
         ));
         await axios.post(`/api/chats/${chat._id}/read`).catch(err => console.error('Failed to mark as read', err));
+        markRead(chat.unreadCount);
       }
     } catch (err) {
       console.error(err);
