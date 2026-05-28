@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -33,7 +34,9 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type: String,
         default: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date
 }, {
     timestamps: true
 });
@@ -47,6 +50,21 @@ userSchema.pre('save', async function() {
 // Compare password
 userSchema.methods.comparePassword = async function(candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+// Generate and hash password reset token
+userSchema.methods.createPasswordResetToken = function() {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    this.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    // Token expires in 10 minutes
+    this.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+
+    return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);

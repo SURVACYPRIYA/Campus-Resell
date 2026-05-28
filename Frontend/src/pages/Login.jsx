@@ -21,7 +21,7 @@ const Login = () => {
         setIsLoading(true);
         setError('');
         await googleLogin(tokenResponse.access_token, true);
-        navigate('/marketplace');
+        navigate('/');
       } catch (err) {
         console.error('Google Login error:', err);
         setError(err.response?.data?.message || err.message || 'Google login failed');
@@ -46,7 +46,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       await login(email, password);
-      navigate('/marketplace');
+      navigate('/');
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data?.message || err.message || 'Failed to login');
@@ -279,6 +279,18 @@ const Login = () => {
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <Link to="/forgot-password" style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--primary)',
+                  textDecoration: 'none',
+                  fontWeight: '600',
+                  transition: 'opacity 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                >Forgot password?</Link>
               </div>
             </div>
 

@@ -18,6 +18,8 @@ import Contact from './pages/Contact';
 import Dashboard from './pages/Dashboard';
 import MyListings from './pages/MyListings';
 import Purchases from './pages/Purchases';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import { useAuth } from './context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import './index.css';
@@ -93,6 +95,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/story" element={<Story />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contact" element={<Contact />} />

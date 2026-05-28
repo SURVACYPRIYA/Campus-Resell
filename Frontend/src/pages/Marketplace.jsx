@@ -13,7 +13,6 @@ const Marketplace = () => {
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
-  const [onlyVerified, setOnlyVerified] = useState(false);
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -133,23 +132,6 @@ const Marketplace = () => {
             }}>{cat}</button>
           ))}
         </div>
-        {/* VERIFIED FILTER TOGGLE */}
-        <button onClick={() => setOnlyVerified(!onlyVerified)} style={{
-          padding: '8px 16px',
-          borderRadius: '20px',
-          border: '1px solid #16a34a',
-          background: onlyVerified ? '#16a34a' : '#ffffff',
-          color: onlyVerified ? '#ffffff' : '#16a34a',
-          fontWeight: '600',
-          fontSize: '0.85rem',
-          cursor: 'pointer',
-          transition: 'all 0.2s',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px'
-        }}>
-          <span>✓</span> Show Only AU Verified Sellers
-        </button>
       </div>
 
       {/* LOADING */}
@@ -160,7 +142,7 @@ const Marketplace = () => {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '30px' }}>
           {/* PRODUCT CARDS */}
-          {(onlyVerified ? products.filter((p, idx) => idx % 3 !== 0) : products).map((product, index) => (
+          {products.map((product, index) => (
             <div key={product._id} className="glass-card animate-fade-in" style={{ padding: '15px', display: 'flex', flexDirection: 'column', animationDelay: `${index * 0.08}s` }}>
               {/* PRODUCT IMAGE */}
               <div style={{ width: '100%', height: '200px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '15px', overflow: 'hidden' }}>
