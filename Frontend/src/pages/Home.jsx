@@ -150,194 +150,7 @@ const Home = () => {
             ))}
           </section>
 
-          {/* BROWSE BY CATEGORY */}
-          <section style={{ marginTop: '80px', textAlign: 'center' }}>
-            <style>{`
-              .cat-section-header {
-                margin-bottom: 40px;
-              }
-              .cat-eyebrow-new {
-                color: var(--primary);
-                font-weight: 700;
-                font-size: 0.85rem;
-                text-transform: uppercase;
-                letter-spacing: 0.12em;
-                display: inline-block;
-                margin-bottom: 8px;
-              }
-              .cat-heading-new {
-                font-size: 2.2rem;
-                font-weight: 800;
-                margin-bottom: 10px;
-                color: #233559;
-              }
-              .cat-sub-new {
-                color: var(--text-muted);
-                font-size: 1rem;
-                max-width: 600px;
-                margin: 0 auto;
-              }
-              .cat-grid-new {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 24px;
-              }
-              @media (max-width: 960px) { .cat-grid-new { grid-template-columns: repeat(2, 1fr); } }
-              @media (max-width: 520px)  { .cat-grid-new { grid-template-columns: 1fr; } }
 
-              .cat-card-new {
-                background: #ffffff;
-                border: 1px solid var(--glass-border);
-                border-radius: 16px;
-                padding: 32px 24px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 16px;
-                text-decoration: none;
-                cursor: pointer;
-                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
-              }
-              .cat-card-new:hover {
-                transform: translateY(-6px);
-                border-color: var(--accent-hover-color);
-                box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-              }
-              .cat-card-new:hover .cat-icon-container {
-                transform: scale(1.08);
-              }
-              .cat-card-new:hover .cat-arrow-new {
-                color: var(--accent-hover-color);
-                transform: translateX(4px);
-              }
-
-              .cat-icon-container {
-                width: 64px;
-                height: 64px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: transform 0.3s ease;
-              }
-              .cat-name-new {
-                font-size: 1.1rem;
-                font-weight: 700;
-                color: #233559;
-              }
-              .cat-badge-new {
-                font-size: 0.78rem;
-                font-weight: 600;
-                color: var(--text-muted);
-                background: #f1f5f9;
-                padding: 4px 12px;
-                border-radius: 100px;
-              }
-              .cat-arrow-new {
-                color: var(--text-muted);
-                transition: all 0.25s ease;
-                display: inline-flex;
-                align-items: center;
-              }
-              .cat-explore-btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                margin-top: 40px;
-                padding: 12px 30px;
-                border: 2px solid var(--primary);
-                border-radius: 30px;
-                color: var(--primary);
-                font-weight: 700;
-                text-decoration: none;
-                transition: all 0.2s ease;
-              }
-              .cat-explore-btn:hover {
-                background: var(--primary);
-                color: #ffffff;
-                box-shadow: 0 4px 12px rgba(193, 38, 50, 0.15);
-                transform: translateY(-1px);
-              }
-            `}</style>
-
-            <div className="cat-section-header">
-              <span className="cat-eyebrow-new">Explore Categories</span>
-              <h2 className="cat-heading-new">Browse by Category</h2>
-              <p className="cat-sub-new">Find exactly what you need from our organized student marketplace</p>
-            </div>
-
-            <div className="cat-grid-new">
-              {[
-                {
-                  name: "Books",
-                  icon: <Book size={26} />,
-                  path: "/marketplace?category=Books",
-                  iconBg: "#fef2f2",
-                  iconColor: "var(--primary)",
-                  accentColor: "var(--primary)"
-                },
-                {
-                  name: "Electronics",
-                  icon: <Monitor size={26} />,
-                  path: "/marketplace?category=Electronics",
-                  iconBg: "#eff6ff",
-                  iconColor: "#233559",
-                  accentColor: "#233559"
-                },
-                {
-                  name: "Cycles",
-                  icon: <Bike size={26} />,
-                  path: "/marketplace?category=Cycles",
-                  iconBg: "#fef9c3",
-                  iconColor: "#e5b72a",
-                  accentColor: "var(--secondary)"
-                },
-                {
-                  name: "Others",
-                  icon: <Package size={26} />,
-                  path: "/marketplace?category=Others",
-                  iconBg: "#f5f3ff",
-                  iconColor: "#7c3aed",
-                  accentColor: "#7c3aed"
-                }
-              ].map((cat, i) => (
-                <motion.div key={i}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.05 }}
-                >
-                  <Link
-                    to={cat.path}
-                    className="cat-card-new"
-                    style={{
-                      borderTop: `4px solid ${cat.accentColor}`,
-                      '--accent-hover-color': cat.accentColor
-                    }}
-                  >
-                    <div
-                      className="cat-icon-container"
-                      style={{ background: cat.iconBg, color: cat.iconColor }}
-                    >
-                      {cat.icon}
-                    </div>
-                    <span className="cat-name-new">{cat.name}</span>
-                    <span className="cat-badge-new">{counts[cat.name] || 0} {counts[cat.name] === 1 ? 'item' : 'items'}</span>
-                    <div className="cat-arrow-new">
-                      <ArrowRight size={16} />
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-
-            <div>
-              <Link to="/marketplace" className="cat-explore-btn">
-                View All Categories <ArrowRight size={16} />
-              </Link>
-            </div>
-          </section>
 
           {/* CAMPUS STATS */}
           <section id="stats" style={{ marginTop: '80px', textAlign: 'center' }}>
@@ -401,32 +214,63 @@ const Home = () => {
             </div>
           </section>
 
-          {/* MEETUP SAFETY COVENANTS */}
-          <section className="glass-card" style={{ marginTop: '80px', padding: '40px', background: '#f8fafc', borderLeft: '6px solid var(--primary)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', alignItems: 'center' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--primary)', marginBottom: '15px' }}>
-                <ShieldAlert size={28} />
-                <span style={{ fontWeight: '700', fontSize: '1rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Safety Covenant</span>
+          {/* MEETUP SAFETY COVENANTS - REDESIGNED (THEME MATCHED) */}
+          <section className="glass-card" style={{ 
+            marginTop: '80px', 
+            padding: '50px 40px', 
+            background: '#f8fafc', 
+            borderLeft: '6px solid var(--primary)', 
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.03)'
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', color: 'var(--primary)', marginBottom: '15px' }}>
+                <ShieldAlert size={24} />
+                <span style={{ fontWeight: '700', fontSize: '0.95rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Safety Covenant</span>
               </div>
-              <h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '20px', color: '#233559' }}>Recommended Campus Meetup Zones</h2>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '2.4rem', fontWeight: '800', marginBottom: '15px', color: '#233559' }}>Recommended Meetup Zones</h2>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', maxWidth: '650px', margin: '0 auto', fontSize: '1.05rem' }}>
                 For maximum safety, always arrange to meet buyers/sellers on-campus during daylight hours.
                 Never transfer money online before verifying the item condition in person.
               </p>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'col', gap: '15px', justifyContent: 'center' }}>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
               {[
-                { title: "📚 Central Library Lobby", desc: "Monitored, safe indoor space (Block-A)" },
-                { title: "☕ Block-D Cafeteria", desc: "Highly populated open social space" },
-                { title: "🌳 Administrative Plaza", desc: "Central location with campus security presence" }
+                { title: "Central Library Lobby", desc: "Monitored, safe indoor space with constant foot traffic. Ideal for book and small item exchanges.", icon: "📚", block: "Block-G" },
+                { title: "Block-D Cafeteria", desc: "Highly populated open social space. Great for daylight meetups and sitting down to test electronics.", icon: "☕", block: "Block-D" },
+                { title: "Administrative Plaza", desc: "Central location with direct campus security presence. Recommended for high-value items.", icon: "🌳", block: "Central" }
               ].map((zone, i) => (
-                <div key={i} style={{ display: 'flex', gap: '15px', padding: '15px', background: 'white', borderRadius: '8px', border: '1px solid var(--glass-border)', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '10px' }}>
-                  <MapPin style={{ color: 'var(--secondary)', flexShrink: 0 }} />
-                  <div>
-                    <h4 style={{ fontWeight: '700', color: 'var(--text-main)', marginBottom: '3px' }}>{zone.title}</h4>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{zone.desc}</p>
+                <motion.div
+                  key={i}
+                  whileHover={{ y: -6, boxShadow: '0 12px 24px rgba(0,0,0,0.08)' }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  style={{
+                    background: '#ffffff',
+                    border: '1px solid var(--glass-border)',
+                    borderRadius: '12px',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.02)'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: '2.2rem' }}>{zone.icon}</div>
+                    <span style={{ background: '#fef2f2', color: 'var(--primary)', padding: '4px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: '700', letterSpacing: '0.05em' }}>{zone.block}</span>
                   </div>
-                </div>
+                  <div>
+                    <h4 style={{ fontWeight: '800', color: '#233559', marginBottom: '8px', fontSize: '1.15rem' }}>
+                      {zone.title}
+                    </h4>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>{zone.desc}</p>
+                  </div>
+                  <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--secondary)', cursor: 'pointer' }}>
+                    <MapPin size={16} />
+                    <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>View on Campus Map</span>
+                  </div>
+                </motion.div>
               ))}
             </div>
           </section>
