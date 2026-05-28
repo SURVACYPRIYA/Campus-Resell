@@ -14,9 +14,7 @@ const AdminDashboard = () => {
 
   const fetchReports = async () => {
     try {
-      const res = await axios.get('/api/reports', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      const res = await axios.get('/api/reports');
       setReports(res.data.data.reports);
     } catch (err) {
       console.error(err);
@@ -30,8 +28,6 @@ const AdminDashboard = () => {
       await axios.patch(`/api/reports/${id}/resolve`, {
         status,
         banUser
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       fetchReports();
     } catch (err) {

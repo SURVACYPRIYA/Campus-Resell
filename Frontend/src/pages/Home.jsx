@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Zap, Users, MapPin, ShieldAlert, Star, ArrowRight, Book, Monitor, Armchair, Coffee, Settings, Activity, Bike, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import axios from '../axios';
 
 /* ---------- student reviews ---------- */
 const REVIEWS = [
@@ -30,6 +31,27 @@ const StarRating = ({ rating, size = 13 }) => (
 
 const Home = () => {
   const { user } = useAuth();
+  const [counts, setCounts] = useState({
+    Books: 0,
+    Electronics: 0,
+    Cycles: 0,
+    Others: 0
+  });
+
+  useEffect(() => {
+    const fetchCategoryCounts = async () => {
+      try {
+        const res = await axios.get('/api/products/category-counts');
+        if (res.data && res.data.data) {
+          setCounts(res.data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching category counts:', err);
+      }
+    };
+    fetchCategoryCounts();
+  }, []);
+
   return (
     <>
       <style>{`
@@ -130,102 +152,191 @@ const Home = () => {
 
           {/* BROWSE BY CATEGORY */}
           <section style={{ marginTop: '80px', textAlign: 'center' }}>
-            <span style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Explore</span>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '10px', marginBottom: '8px', color: '#233559' }}>Browse by Category</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '45px' }}>Find exactly what you need from our organized categories</p>
+            <style>{`
+              .cat-section-header {
+                margin-bottom: 40px;
+              }
+              .cat-eyebrow-new {
+                color: var(--primary);
+                font-weight: 700;
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                display: inline-block;
+                margin-bottom: 8px;
+              }
+              .cat-heading-new {
+                font-size: 2.2rem;
+                font-weight: 800;
+                margin-bottom: 10px;
+                color: #233559;
+              }
+              .cat-sub-new {
+                color: var(--text-muted);
+                font-size: 1rem;
+                max-width: 600px;
+                margin: 0 auto;
+              }
+              .cat-grid-new {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 24px;
+              }
+              @media (max-width: 960px) { .cat-grid-new { grid-template-columns: repeat(2, 1fr); } }
+              @media (max-width: 520px)  { .cat-grid-new { grid-template-columns: 1fr; } }
 
-            <div className="cat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+              .cat-card-new {
+                background: #ffffff;
+                border: 1px solid var(--glass-border);
+                border-radius: 16px;
+                padding: 32px 24px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+                text-decoration: none;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+              }
+              .cat-card-new:hover {
+                transform: translateY(-6px);
+                border-color: var(--accent-hover-color);
+                box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+              }
+              .cat-card-new:hover .cat-icon-container {
+                transform: scale(1.08);
+              }
+              .cat-card-new:hover .cat-arrow-new {
+                color: var(--accent-hover-color);
+                transform: translateX(4px);
+              }
+
+              .cat-icon-container {
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: transform 0.3s ease;
+              }
+              .cat-name-new {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #233559;
+              }
+              .cat-badge-new {
+                font-size: 0.78rem;
+                font-weight: 600;
+                color: var(--text-muted);
+                background: #f1f5f9;
+                padding: 4px 12px;
+                border-radius: 100px;
+              }
+              .cat-arrow-new {
+                color: var(--text-muted);
+                transition: all 0.25s ease;
+                display: inline-flex;
+                align-items: center;
+              }
+              .cat-explore-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 40px;
+                padding: 12px 30px;
+                border: 2px solid var(--primary);
+                border-radius: 30px;
+                color: var(--primary);
+                font-weight: 700;
+                text-decoration: none;
+                transition: all 0.2s ease;
+              }
+              .cat-explore-btn:hover {
+                background: var(--primary);
+                color: #ffffff;
+                box-shadow: 0 4px 12px rgba(193, 38, 50, 0.15);
+                transform: translateY(-1px);
+              }
+            `}</style>
+
+            <div className="cat-section-header">
+              <span className="cat-eyebrow-new">Explore Categories</span>
+              <h2 className="cat-heading-new">Browse by Category</h2>
+              <p className="cat-sub-new">Find exactly what you need from our organized student marketplace</p>
+            </div>
+
+            <div className="cat-grid-new">
               {[
-                { name: "Books",       icon: <Book size={30} />,     path: "/marketplace?category=Books",       gradient: "linear-gradient(135deg, #4facfe, #00f2fe)", items: "120+" },
-                { name: "Electronics", icon: <Monitor size={30} />,  path: "/marketplace?category=Electronics", gradient: "linear-gradient(135deg, #f093fb, #f5576c)", items: "78+" },
-                { name: "Cycles",      icon: <Bike size={30} />,     path: "/marketplace?category=Cycles",      gradient: "linear-gradient(135deg, #43e97b, #38f9d7)", items: "35+" },
-                { name: "Others",      icon: <Package size={30} />,  path: "/marketplace?category=Others",      gradient: "linear-gradient(135deg, #89f7fe, #66a6ff)", items: "60+" }
+                {
+                  name: "Books",
+                  icon: <Book size={26} />,
+                  path: "/marketplace?category=Books",
+                  iconBg: "#fef2f2",
+                  iconColor: "var(--primary)",
+                  accentColor: "var(--primary)"
+                },
+                {
+                  name: "Electronics",
+                  icon: <Monitor size={26} />,
+                  path: "/marketplace?category=Electronics",
+                  iconBg: "#eff6ff",
+                  iconColor: "#233559",
+                  accentColor: "#233559"
+                },
+                {
+                  name: "Cycles",
+                  icon: <Bike size={26} />,
+                  path: "/marketplace?category=Cycles",
+                  iconBg: "#fef9c3",
+                  iconColor: "#e5b72a",
+                  accentColor: "var(--secondary)"
+                },
+                {
+                  name: "Others",
+                  icon: <Package size={26} />,
+                  path: "/marketplace?category=Others",
+                  iconBg: "#f5f3ff",
+                  iconColor: "#7c3aed",
+                  accentColor: "#7c3aed"
+                }
               ].map((cat, i) => (
-                <Link key={i} to={cat.path} style={{ textDecoration: 'none' }}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: i * 0.06 }}
-                    whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
+                <motion.div key={i}
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                >
+                  <Link
+                    to={cat.path}
+                    className="cat-card-new"
                     style={{
-                      background: '#ffffff',
-                      borderRadius: '20px',
-                      padding: '28px 20px 24px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '14px',
-                      cursor: 'pointer',
-                      border: '1px solid #e8ecf3',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'transparent';
-                      e.currentTarget.querySelector('.cat-glow').style.opacity = '1';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = '#e8ecf3';
-                      e.currentTarget.querySelector('.cat-glow').style.opacity = '0';
+                      borderTop: `4px solid ${cat.accentColor}`,
+                      '--accent-hover-color': cat.accentColor
                     }}
                   >
-                    {/* Background glow on hover */}
-                    <div className="cat-glow" style={{
-                      position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%',
-                      background: cat.gradient, opacity: 0, transition: 'opacity 0.4s',
-                      filter: 'blur(60px)', pointerEvents: 'none', zIndex: 0
-                    }} />
-
-                    {/* Icon circle */}
-                    <div style={{
-                      width: '64px', height: '64px', borderRadius: '18px',
-                      background: cat.gradient,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: '#ffffff', position: 'relative', zIndex: 1,
-                      boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
-                    }}>
+                    <div
+                      className="cat-icon-container"
+                      style={{ background: cat.iconBg, color: cat.iconColor }}
+                    >
                       {cat.icon}
                     </div>
-
-                    {/* Name */}
-                    <span style={{
-                      fontSize: '1.05rem', fontWeight: '700', color: '#233559',
-                      position: 'relative', zIndex: 1
-                    }}>
-                      {cat.name}
-                    </span>
-
-                    {/* Item count */}
-                    <span style={{
-                      fontSize: '0.78rem', fontWeight: '600', color: 'var(--text-muted)',
-                      background: '#f1f5f9', padding: '3px 12px', borderRadius: '20px',
-                      position: 'relative', zIndex: 1
-                    }}>
-                      {cat.items} items
-                    </span>
-
-                    {/* Arrow indicator */}
-                    <div style={{
-                      position: 'relative', zIndex: 1, marginTop: '2px',
-                      color: 'var(--text-muted)', transition: 'color 0.2s'
-                    }}>
+                    <span className="cat-name-new">{cat.name}</span>
+                    <span className="cat-badge-new">{counts[cat.name] || 0} {counts[cat.name] === 1 ? 'item' : 'items'}</span>
+                    <div className="cat-arrow-new">
                       <ArrowRight size={16} />
                     </div>
-                  </motion.div>
-                </Link>
+                  </Link>
+                </motion.div>
               ))}
             </div>
 
-            <style>{`
-              @media (max-width: 900px) {
-                .cat-grid { grid-template-columns: repeat(2, 1fr) !important; }
-              }
-              @media (max-width: 500px) {
-                .cat-grid { grid-template-columns: 1fr !important; }
-              }
-            `}</style>
+            <div>
+              <Link to="/marketplace" className="cat-explore-btn">
+                View All Categories <ArrowRight size={16} />
+              </Link>
+            </div>
           </section>
 
           {/* CAMPUS STATS */}

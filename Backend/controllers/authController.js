@@ -33,9 +33,15 @@ exports.register = async (req, res) => {
 
         const token = signToken(user._id);
 
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+
         res.status(201).json({
             status: 'success',
-            token,
             data: {
                 user: {
                     id: user._id,
@@ -78,9 +84,15 @@ exports.login = async (req, res) => {
         // 4) If everything ok, send token to client
         const token = signToken(user._id);
 
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+
         res.status(200).json({
             status: 'success',
-            token,
             data: {
                 user: {
                     id: user._id,
@@ -167,9 +179,15 @@ exports.googleLogin = async (req, res) => {
 
         const jwtToken = signToken(user._id);
 
+        res.cookie('token', jwtToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+
         res.status(200).json({
             status: 'success',
-            token: jwtToken,
             data: {
                 user: {
                     id: user._id,
@@ -184,4 +202,12 @@ exports.googleLogin = async (req, res) => {
         console.error('Google login error:', error);
         res.status(400).json({ message: error.message || 'Google authentication failed' });
     }
+};
+
+exports.logout = (req, res) => {
+    res.cookie('token', 'loggedout', {
+        httpOnly: true,
+        expires: new Date(Date.now() + 10 * 1000), // expires in 10 seconds
+    });
+    res.status(200).json({ status: 'success', message: 'Logged out successfully' });
 };

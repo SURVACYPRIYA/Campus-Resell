@@ -164,7 +164,7 @@ const Marketplace = () => {
             <div key={product._id} className="glass-card animate-fade-in" style={{ padding: '15px', display: 'flex', flexDirection: 'column', animationDelay: `${index * 0.08}s` }}>
               {/* PRODUCT IMAGE */}
               <div style={{ width: '100%', height: '200px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '15px', overflow: 'hidden' }}>
-                <img src={product.images[0] || fallbackImage} alt={product.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = fallbackImage; }} />
+                <img src={product.images[0] || fallbackImage} alt={product.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = fallbackImage; }} />
               </div>
 
               {/* PRODUCT DETAILS */}

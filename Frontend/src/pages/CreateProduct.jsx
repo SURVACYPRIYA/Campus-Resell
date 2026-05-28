@@ -178,18 +178,30 @@ const CreateProduct = () => {
       return;
     }
 
-    const imageUrls = [];
-    imageFiles.forEach((file) => imageUrls.push(URL.createObjectURL(file)));
-    if (formData.imageUrl) {
-      formData.imageUrl.split(',').map(l => l.trim()).filter(Boolean).forEach(l => imageUrls.push(l));
-    }
-    if (imageUrls.length === 0) imageUrls.push('https://via.placeholder.com/300?text=Product+Image');
-
     try {
+      // Convert each file to base64 so it can be stored in DB and viewed by anyone
+      const toBase64 = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+        });
+
+      const base64Images = await Promise.all(imageFiles.map(toBase64));
+
+      // Merge with any pasted URL links
+      const urlImages = formData.imageUrl
+        ? formData.imageUrl.split(',').map(l => l.trim()).filter(Boolean)
+        : [];
+
+      const imageUrls = [...base64Images, ...urlImages];
+      if (imageUrls.length === 0)
+        imageUrls.push('https://via.placeholder.com/300?text=Product+Image');
+
       await axios.post(
         '/api/products',
-        { ...formData, price: Number(formData.price), images: imageUrls },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        { ...formData, price: Number(formData.price), images: imageUrls }
       );
       navigate('/marketplace');
     } catch (err) {

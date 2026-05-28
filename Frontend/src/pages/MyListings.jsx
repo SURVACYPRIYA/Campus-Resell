@@ -33,7 +33,7 @@ const MyListings = () => {
     if (!window.confirm('Delete this listing? This cannot be undone.')) return;
     try {
       await axios.delete(`/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${null}` }
       });
       setProducts(prev => prev.filter(p => p._id !== id));
     } catch (err) {

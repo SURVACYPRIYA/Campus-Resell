@@ -17,22 +17,16 @@ export const AuthProvider = ({ children }) => {
     const API_URL = '/api/auth';
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            fetchUser(token);
-        } else {
-            setLoading(false);
-        }
+        // Just try fetching user; cookies will be sent automatically
+        fetchUser();
     }, []);
 
-    const fetchUser = async (token) => {
+    const fetchUser = async () => {
         try {
-            const res = await axios.get(`${API_URL}/me`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axios.get(`${API_URL}/me`);
             setUser(sanitizeUser(res.data.data.user));
         } catch (err) {
-            localStorage.removeItem('token');
+            setUser(null);
         } finally {
             setLoading(false);
         }
@@ -40,14 +34,12 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         const res = await axios.post(`${API_URL}/login`, { email, password });
-        localStorage.setItem('token', res.data.token);
         setUser(sanitizeUser(res.data.data.user));
         return res.data;
     };
 
     const register = async (name, email, password) => {
         const res = await axios.post(`${API_URL}/register`, { name, email, password });
-        localStorage.setItem('token', res.data.token);
         setUser(sanitizeUser(res.data.data.user));
         return res.data;
     };
@@ -55,13 +47,16 @@ export const AuthProvider = ({ children }) => {
     const googleLogin = async (token, isAccessToken = false) => {
         const payload = isAccessToken ? { accessToken: token } : { token };
         const res = await axios.post(`${API_URL}/google`, payload);
-        localStorage.setItem('token', res.data.token);
         setUser(sanitizeUser(res.data.data.user));
         return res.data;
     };
 
-    const logout = () => {
-        localStorage.removeItem('token');
+    const logout = async () => {
+        try {
+            await axios.post(`${API_URL}/logout`);
+        } catch (err) {
+            console.error('Logout error:', err);
+        }
         setUser(null);
     };
 

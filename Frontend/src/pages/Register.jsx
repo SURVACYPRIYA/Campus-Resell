@@ -8,7 +8,9 @@ const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState('');
@@ -22,7 +24,7 @@ const Register = () => {
         setIsLoading(true);
         setError('');
         await googleLogin(tokenResponse.access_token, true);
-        navigate('/marketplace');
+        navigate('/');
       } catch (err) {
         console.error('Google Login error:', err);
         setError(err.response?.data?.message || err.message || 'Google registration failed');
@@ -44,10 +46,32 @@ const Register = () => {
       return;
     }
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match. Please re-enter.');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setError('Password must contain at least one uppercase letter.');
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setError('Password must contain at least one number.');
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      setError('Password must contain at least one symbol (e.g. @, #, !).');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await register(name, email, password);
-      navigate('/marketplace');
+      navigate('/');
     } catch (err) {
       console.error("Register error:", err);
       setError(err.response?.data?.message || err.message || 'Failed to register');
@@ -56,20 +80,22 @@ const Register = () => {
     }
   };
 
+  // Password rules checker
+  const pwdRules = [
+    { label: 'At least 8 characters',     ok: password.length >= 8 },
+    { label: 'One uppercase letter (A-Z)', ok: /[A-Z]/.test(password) },
+    { label: 'One number (0-9)',           ok: /[0-9]/.test(password) },
+    { label: 'One symbol (@, #, ! …)',     ok: /[^A-Za-z0-9]/.test(password) },
+  ];
+
   // Password strength indicator
   const getPasswordStrength = () => {
     if (!password) return { level: 0, text: '', color: '' };
-    let score = 0;
-    if (password.length >= 6) score++;
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-
-    if (score <= 1) return { level: 1, text: 'Weak', color: '#ef4444' };
-    if (score <= 2) return { level: 2, text: 'Fair', color: '#f59e0b' };
-    if (score <= 3) return { level: 3, text: 'Good', color: '#3b82f6' };
-    return { level: 4, text: 'Strong', color: '#22c55e' };
+    const passed = pwdRules.filter(r => r.ok).length;
+    if (passed <= 1) return { level: 1, text: 'Weak',   color: '#ef4444' };
+    if (passed === 2) return { level: 2, text: 'Fair',   color: '#f59e0b' };
+    if (passed === 3) return { level: 3, text: 'Good',   color: '#3b82f6' };
+    return              { level: 4, text: 'Strong', color: '#22c55e' };
   };
 
   const strength = getPasswordStrength();
@@ -322,35 +348,120 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Password strength bar */}
+            {/* Password requirements checklist */}
             {password && (
-              <div style={{ marginBottom: '22px' }}>
-                <div style={{
-                  display: 'flex',
-                  gap: '4px',
-                  marginBottom: '6px'
-                }}>
+              <div style={{
+                marginBottom: '12px',
+                padding: '12px 14px',
+                background: '#f8fafc',
+                borderRadius: '10px',
+                border: '1px solid #e2e8f0'
+              }}>
+                {/* Strength bar */}
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '10px' }}>
                   {[1, 2, 3, 4].map((i) => (
                     <div key={i} style={{
-                      flex: 1,
-                      height: '4px',
-                      borderRadius: '4px',
+                      flex: 1, height: '4px', borderRadius: '4px',
                       background: i <= strength.level ? strength.color : 'rgba(0,0,0,0.06)',
                       transition: 'all 0.3s ease'
                     }} />
                   ))}
                 </div>
-                <p style={{
-                  fontSize: '0.78rem',
-                  fontWeight: '600',
-                  color: strength.color,
-                  margin: 0,
-                  textAlign: 'right'
-                }}>{strength.text}</p>
+                {/* Rule checklist */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  {pwdRules.map((rule, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                      <span style={{
+                        width: '16px', height: '16px', borderRadius: '50%',
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '0.65rem', fontWeight: '800', flexShrink: 0,
+                        background: rule.ok ? '#dcfce7' : '#fee2e2',
+                        color: rule.ok ? '#16a34a' : '#dc2626',
+                        transition: 'all 0.2s'
+                      }}>
+                        {rule.ok ? '✓' : '✗'}
+                      </span>
+                      <span style={{
+                        fontSize: '0.78rem',
+                        color: rule.ok ? '#16a34a' : '#64748b',
+                        fontWeight: rule.ok ? '600' : '400',
+                        transition: 'color 0.2s'
+                      }}>
+                        {rule.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            {!password && <div style={{ marginBottom: '22px' }} />}
+            {!password && <div style={{ marginBottom: '12px' }} />}
+
+            {/* Confirm Password */}
+            <div style={{ marginBottom: '24px' }}>
+              <label style={labelStyle}>
+                Confirm Password <span style={asteriskStyle}>*</span>
+              </label>
+              <div style={{
+                ...inputWrapperStyle('confirmPassword'),
+                borderColor: confirmPassword
+                  ? confirmPassword === password
+                    ? '#22c55e'
+                    : '#ef4444'
+                  : focusedField === 'confirmPassword'
+                    ? 'var(--primary)'
+                    : 'rgba(0,0,0,0.08)'
+              }}>
+                <span style={iconStyle}><Lock size={18} /></span>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Re-enter your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onFocus={() => setFocusedField('confirmPassword')}
+                  onBlur={() => setFocusedField('')}
+                  required
+                  disabled={isLoading}
+                  style={{ ...inputStyle, paddingRight: '48px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '14px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px',
+                    borderRadius: '8px',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {/* Match feedback */}
+              {confirmPassword && (
+                <p style={{
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  color: confirmPassword === password ? '#22c55e' : '#ef4444',
+                  margin: '6px 0 0',
+                  textAlign: 'right'
+                }}>
+                  {confirmPassword === password ? '✓ Passwords match' : '✗ Passwords do not match'}
+                </p>
+              )}
+            </div>
 
             {/* Submit */}
             <button

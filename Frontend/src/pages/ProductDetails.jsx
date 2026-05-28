@@ -54,8 +54,7 @@ const ProductDetails = () => {
         const base64 = reader.result;
         const res = await axios.patch(
           `/api/products/${product._id}`,
-          { images: [base64] },
-          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+          { images: [base64] }
         );
         setProduct(res.data.data.product);
         setShowCamera(false);
@@ -104,9 +103,7 @@ const ProductDetails = () => {
     if (isEditing && isSeller) {
       const fetchBuyers = async () => {
         try {
-          const res = await axios.get(`/api/chats/product/${product._id}/buyers`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          });
+          const res = await axios.get(`/api/chats/product/${product._id}/buyers`);
           setInterestedBuyers(res.data.data.buyers || []);
         } catch (err) {
           console.error('Failed to fetch interested buyers', err);
@@ -120,9 +117,7 @@ const ProductDetails = () => {
     if (ratingInput === 0) return toast.error('Please select a star rating');
     setIsSubmittingReview(true);
     try {
-      const res = await axios.post(`/api/products/${product._id}/review`, { rating: ratingInput, reviewText: reviewTextInput }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      const res = await axios.post(`/api/products/${product._id}/review`, { rating: ratingInput, reviewText: reviewTextInput });
       setProduct(res.data.data.product);
       toast.success('Review submitted successfully!');
     } catch (err) {
@@ -157,11 +152,6 @@ const ProductDetails = () => {
           description: editDescription,
           status: editStatus,
           buyer: (editStatus === 'sold' && editBuyer) ? editBuyer : null
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
         }
       );
       setProduct(res.data.data.product);
@@ -184,11 +174,6 @@ const ProductDetails = () => {
         {
           sellerId: product.seller._id,
           productId: product._id
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
         }
       );
 
@@ -218,11 +203,6 @@ const ProductDetails = () => {
           reportedProductId: product._id,
           reportedUserId: product.seller._id,
           reason
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
         }
       );
 

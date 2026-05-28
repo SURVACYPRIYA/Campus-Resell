@@ -55,7 +55,7 @@ const Profile = () => {
     try {
       await axios.delete(`/api/products/${productId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${null}`
         }
       });
       setProducts((prev) => prev.filter((p) => p._id !== productId));

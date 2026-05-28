@@ -34,6 +34,11 @@ const setupSocket = (server) => {
           content: data.content
         });
 
+        // UPDATE CHAT'S LAST MESSAGE
+        const Chat = require('./models/Chat');
+        await Chat.findByIdAndUpdate(data.chatId, { lastMessage: newMessage._id });
+
+
         // GET FULL MESSAGE WITH USER
         const populatedMessage =
           await Message.findById(newMessage._id)

@@ -5,6 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.get('/', productController.getAllProducts);
+router.get('/category-counts', productController.getCategoryCounts);
 router.get('/:id', productController.getProduct);
 
 router.use(protect); // Protect all routes below

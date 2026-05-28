@@ -180,3 +180,32 @@ exports.addReview = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+exports.getCategoryCounts = async (req, res) => {
+    try {
+        const counts = await Product.aggregate([
+            { $match: { status: 'available' } },
+            { $group: { _id: '$category', count: { $sum: 1 } } }
+        ]);
+
+        const countsMap = {
+            Books: 0,
+            Electronics: 0,
+            Cycles: 0,
+            Others: 0
+        };
+
+        counts.forEach(item => {
+            if (item._id && item._id in countsMap) {
+                countsMap[item._id] = item.count;
+            }
+        });
+
+        res.status(200).json({
+            status: 'success',
+            data: countsMap
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

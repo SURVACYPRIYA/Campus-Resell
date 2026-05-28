@@ -118,10 +118,15 @@ const ChatPage = () => {
 
   const fetchChats = async () => {
     try {
-      const res = await axios.get('/api/chats', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      const res = await axios.get('/api/chats');
+      const fetchedChats = res.data.data.chats;
+      setChats(fetchedChats);
+      
+      // Join all chat rooms so we can receive live updates for them in the background
+      fetchedChats.forEach(chat => {
+        socket.emit('join_chat', chat._id);
       });
-      setChats(res.data.data.chats);
+      
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -138,19 +143,30 @@ const ChatPage = () => {
         setMessages((prev) => [...prev, data]);
         // Mark as read immediately if it's the active chat and not my message
         if (data.sender._id !== user._id) {
-           axios.post(`/api/chats/${data.chatId}/read`, {}, {
-             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-           }).catch(console.error);
+           axios.post(`/api/chats/${data.chatId}/read`).catch(console.error);
         }
       } else {
-        // Increment unread count for the background chat
-        setChats(prevChats => prevChats.map(c => 
-          c._id === data.chatId ? { ...c, unreadCount: (c.unreadCount || 0) + 1 } : c
-        ));
         // Show toast notification
         toast.success(`New message from ${data.sender?.name || 'Someone'}`);
-
       }
+
+      // Real-time update for the sidebar list
+      setChats(prevChats => {
+        let updatedChats = [...prevChats];
+        const chatIndex = updatedChats.findIndex(c => c._id === data.chatId);
+        
+        if (chatIndex > -1) {
+          const chatToUpdate = updatedChats.splice(chatIndex, 1)[0];
+          chatToUpdate.lastMessage = data;
+          
+          if (data.sender._id !== user._id && (!activeChat || activeChat._id !== data.chatId)) {
+            chatToUpdate.unreadCount = (chatToUpdate.unreadCount || 0) + 1;
+          }
+          
+          updatedChats.unshift(chatToUpdate);
+        }
+        return updatedChats;
+      });
     });
     return () => { socket.off('receive_message'); };
   }, [activeChat, user]);
@@ -171,9 +187,7 @@ const ChatPage = () => {
     setActiveChat(chat);
     socket.emit('join_chat', chat._id);
     try {
-      const res = await axios.get(`/api/chats/${chat._id}/messages`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      const res = await axios.get(`/api/chats/${chat._id}/messages`);
       setMessages(res.data.data.messages);
 
       // Clear unread count locally and mark as read in DB
@@ -181,9 +195,7 @@ const ChatPage = () => {
         setChats(prevChats => prevChats.map(c => 
           c._id === chat._id ? { ...c, unreadCount: 0 } : c
         ));
-        await axios.post(`/api/chats/${chat._id}/read`, {}, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        }).catch(err => console.error('Failed to mark as read', err));
+        await axios.post(`/api/chats/${chat._id}/read`).catch(err => console.error('Failed to mark as read', err));
       }
     } catch (err) {
       console.error(err);
@@ -193,9 +205,7 @@ const ChatPage = () => {
   const handleDeleteChat = async (chatId) => {
     if (!window.confirm('Are you sure you want to delete this conversation? This cannot be undone.')) return;
     try {
-      await axios.delete(`/api/chats/${chatId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await axios.delete(`/api/chats/${chatId}`);
       setChats((prev) => prev.filter((c) => c._id !== chatId));
       if (activeChat?._id === chatId) { setActiveChat(null); setMessages([]); }
     } catch (err) {
@@ -300,18 +310,13 @@ const ChatPage = () => {
 
                   {/* Info */}
                   <div style={{ flex: 1, overflow: 'hidden' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '3px' }}>
                       <span style={{ color: 'var(--text-main)', fontWeight: '600', fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {other.name}
                       </span>
-                      {chat.product?.price && (
-                        <span style={{ fontSize: '0.72rem', color: '#16a34a', fontWeight: '700', flexShrink: 0 }}>
-                          ₹{chat.product.price}
-                        </span>
-                      )}
                     </div>
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
-                      {chat.product?.title || 'Product Chat'}
+                      {chat.lastMessage?.content || chat.product?.title || 'Product Chat'}
                     </p>
                   </div>
                   {/* UNREAD BADGE */}

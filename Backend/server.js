@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const connectDB = require('./config/db');
 
@@ -38,7 +39,9 @@ const io = new Server(server, {
 });
 
 // MIDDLEWARE
-app.use(express.json());
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ limit: '20mb', extended: true }));
+app.use(cookieParser());
 
 app.use(cors({
     origin:
