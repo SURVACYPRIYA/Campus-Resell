@@ -38,8 +38,13 @@ const ProductDetails = () => {
   const [editBuyer, setEditBuyer] = useState('');
   const [interestedBuyers, setInterestedBuyers] = useState([]);
 
-  const isSeller = user && product && product.seller && user._id === product.seller._id;
-  const isBuyer = user && product && product.buyer && user._id === product.buyer;
+  const getUserId = (userObj) => {
+    if (!userObj) return null;
+    return typeof userObj === 'string' ? userObj : (userObj._id || userObj.id);
+  };
+
+  const isSeller = user && product && product.seller && String(getUserId(user)) === String(getUserId(product.seller));
+  const isBuyer = user && product && product.buyer && String(getUserId(user)) === String(getUserId(product.buyer));
 
   const [sellerRating, setSellerRating] = useState(null);
   const [ratingInput, setRatingInput] = useState(0);
@@ -659,17 +664,23 @@ const ProductDetails = () => {
               <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '20px', color: '#233559' }}>
                 Reviews for {product.seller.name}
               </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 {sellerRating.reviews.map(review => (
                   <div key={review._id} style={{ padding: '20px', background: 'rgba(255,255,255,0.6)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8b1a25)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                          {review.buyer?.name?.charAt(0)?.toUpperCase() || '?'}
+                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8b1a25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white', userSelect: 'none' }}>
+                            {review.buyer?.name?.charAt(0)?.toUpperCase() || '?'}
+                          </span>
                         </div>
                         <div>
-                          <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 'bold', color: '#233559' }}>{review.buyer?.name || 'Anonymous'}</p>
-                          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>Bought: {review.title}</p>
+                          <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 'bold', color: '#233559' }}>
+                            {review.buyer?.name || 'Anonymous'}
+                          </p>
+                          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                            Bought: {review.title}
+                          </p>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '2px' }}>
@@ -750,19 +761,32 @@ const ProductDetails = () => {
             </div>
           ) : (
             <button
-              onClick={handleChat}
-              className="btn-primary"
+              onClick={product.status === 'sold' && !isBuyer ? undefined : handleChat}
+              className={product.status === 'sold' && !isBuyer ? "" : "btn-primary"}
+              disabled={product.status === 'sold' && !isBuyer}
               style={{
                 width: '100%',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '10px',
-                padding: '15px'
+                padding: '15px',
+                background: product.status === 'sold' && !isBuyer ? '#f1f5f9' : undefined,
+                color: product.status === 'sold' && !isBuyer ? '#94a3b8' : undefined,
+                border: product.status === 'sold' && !isBuyer ? '1px dashed #cbd5e1' : undefined,
+                cursor: product.status === 'sold' && !isBuyer ? 'not-allowed' : 'pointer',
+                borderRadius: '8px',
+                fontWeight: '600',
+                fontSize: '0.95rem'
               }}
             >
-              <MessageCircle size={20} />
-              Chat to Buy / Connect
+              {product.status === 'sold' && !isBuyer ? (
+                <>This item has been sold</>
+              ) : isBuyer ? (
+                <><MessageCircle size={20} /> Message Seller (Purchased)</>
+              ) : (
+                <><MessageCircle size={20} /> Chat to Buy / Connect</>
+              )}
             </button>
           )}
         </div>

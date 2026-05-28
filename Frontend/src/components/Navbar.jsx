@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageSquare, PlusCircle, HelpCircle, BookOpen, Mail, ChevronDown, LifeBuoy } from 'lucide-react';
+import { MessageSquare, PlusCircle, HelpCircle, BookOpen, Mail, ChevronDown, LifeBuoy, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
+import { toast } from 'react-hot-toast';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -324,7 +325,42 @@ const Navbar = () => {
                     ))}
                     <hr style={{ margin: '4px 0', border: 'none', borderTop: '1px solid #e2e8f0' }} />
                     <button
-                      onClick={() => { setShowProfileMenu(false); if (window.confirm('Are you sure you want to logout?')) logout(); }}
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        toast.custom((t) => (
+                          <div style={{
+                            background: '#ffffff', padding: '20px 24px', borderRadius: '16px',
+                            boxShadow: '0 10px 40px rgba(35, 53, 89, 0.2)', display: 'flex', flexDirection: 'column', gap: '16px',
+                            border: '1px solid var(--glass-border)', opacity: t.visible ? 1 : 0,
+                            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-10px)',
+                            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)', width: '320px', pointerEvents: 'auto'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                              <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+                                <LogOut size={20} />
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontWeight: '700', color: '#233559', fontSize: '1.05rem' }}>Log Out</span>
+                                <span style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '2px' }}>Are you sure you want to log out?</span>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+                              <button
+                                onClick={() => toast.dismiss(t.id)}
+                                style={{ flex: 1, padding: '10px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#e2e8f0'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                              >Cancel</button>
+                              <button
+                                onClick={() => { toast.dismiss(t.id); logout(); }}
+                                style={{ flex: 1, padding: '10px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#dc2626'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = '#ef4444'}
+                              >Yes, Log Out</button>
+                            </div>
+                          </div>
+                        ), { duration: Infinity, position: 'top-center', id: 'logout-toast' });
+                      }}
                       style={{
                         width: '100%', background: 'none', border: 'none', textAlign: 'left',
                         padding: '10px 16px', cursor: 'pointer', color: '#ef4444',

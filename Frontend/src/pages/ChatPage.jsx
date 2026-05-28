@@ -143,8 +143,49 @@ const ChatPage = () => {
            markRead(1);
         }
       } else {
-        // Show toast notification
-        toast.success(`New message from ${data.sender?.name || 'Someone'}`);
+        // Show premium custom toast notification instead of default tick
+        toast.custom((t) => (
+          <div
+            style={{
+              background: '#ffffff',
+              padding: '12px 20px',
+              borderRadius: '50px',
+              boxShadow: '0 8px 24px rgba(35, 53, 89, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              border: '2px solid var(--primary)',
+              opacity: t.visible ? 1 : 0,
+              transform: t.visible ? 'translateY(0)' : 'translateY(-20px)',
+              transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+              cursor: 'pointer'
+            }}
+            onClick={() => toast.dismiss(t.id)}
+          >
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, var(--primary), #8b1a25)',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: '800',
+              fontSize: '0.85rem'
+            }}>
+              {data.sender?.name?.charAt(0).toUpperCase() || '💬'}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontWeight: '700', color: '#233559', fontSize: '0.9rem', lineHeight: '1.2' }}>
+                {data.sender?.name || 'Someone'}
+              </span>
+              <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '500' }}>
+                Sent you a new message
+              </span>
+            </div>
+          </div>
+        ), { duration: 4000 });
       }
 
       // Real-time update for the sidebar list
@@ -203,15 +244,51 @@ const ChatPage = () => {
     }
   };
 
-  const handleDeleteChat = async (chatId) => {
-    if (!window.confirm('Are you sure you want to delete this conversation? This cannot be undone.')) return;
-    try {
-      await axios.delete(`/api/chats/${chatId}`);
-      setChats((prev) => prev.filter((c) => c._id !== chatId));
-      if (activeChat?._id === chatId) { setActiveChat(null); setMessages([]); }
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete conversation');
-    }
+  const handleDeleteChat = (chatId) => {
+    toast.custom((t) => (
+      <div style={{
+        background: '#ffffff', padding: '20px 24px', borderRadius: '16px',
+        boxShadow: '0 10px 40px rgba(35, 53, 89, 0.2)', display: 'flex', flexDirection: 'column', gap: '16px',
+        border: '1px solid var(--glass-border)', opacity: t.visible ? 1 : 0,
+        transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-10px)',
+        transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)', width: '320px', pointerEvents: 'auto'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+            <Trash2 size={20} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontWeight: '700', color: '#233559', fontSize: '1.05rem' }}>Delete Chat</span>
+            <span style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '2px' }}>This conversation cannot be recovered.</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{ flex: 1, padding: '10px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#e2e8f0'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#f1f5f9'}
+          >Cancel</button>
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                await axios.delete(`/api/chats/${chatId}`);
+                setChats(prev => prev.filter(c => c._id !== chatId));
+                if (activeChat?._id === chatId) setActiveChat(null);
+                toast.success('Conversation deleted');
+              } catch (err) {
+                console.error(err);
+                toast.error('Failed to delete chat');
+              }
+            }}
+            style={{ flex: 1, padding: '10px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#dc2626'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#ef4444'}
+          >Yes, Delete</button>
+        </div>
+      </div>
+    ), { duration: Infinity, position: 'top-center', id: 'delete-chat-toast' });
   };
 
   const handleSendMessage = async (e) => {
@@ -239,7 +316,6 @@ const ChatPage = () => {
 
   return (
     <>
-      <Toaster position="top-right" toastOptions={{ duration: 20000, style: { fontFamily: "'Segoe UI', sans-serif", fontSize: '0.9rem' } }} />
       <div style={{
         height: 'calc(100vh - 80px)',
         display: 'flex',
@@ -277,7 +353,12 @@ const ChatPage = () => {
             </p>
           ) : (
             chats.map((chat) => {
-              const other = chat.participants.find((p) => p._id !== user._id) || chat.participants[0] || {};
+              const getOtherParticipant = (participants) => {
+                const getUserId = (u) => (typeof u === 'string' ? u : (u._id || u.id));
+                const currentUserId = getUserId(user);
+                return participants.find(p => String(getUserId(p)) !== String(currentUserId)) || participants[0] || {};
+              };
+              const other = getOtherParticipant(chat.participants);
               const isActive = activeChat?._id === chat._id;
 
               return (
@@ -313,7 +394,7 @@ const ChatPage = () => {
                   <div style={{ flex: 1, overflow: 'hidden' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '3px' }}>
                       <span style={{ color: 'var(--text-main)', fontWeight: '600', fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {other.name}
+                        {other.name || 'Unknown User'}
                       </span>
                     </div>
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
@@ -355,12 +436,22 @@ const ChatPage = () => {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
               }}>
                 <span style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white' }}>
-                  {(activeChat.participants.find((p) => p._id !== user._id)?.name || '?').charAt(0).toUpperCase()}
+                  {(() => {
+                    const getUserId = (u) => (typeof u === 'string' ? u : (u._id || u.id));
+                    const currentUserId = getUserId(user);
+                    const activeOther = activeChat.participants.find(p => String(getUserId(p)) !== String(currentUserId)) || activeChat.participants[0] || {};
+                    return (activeOther.name || '?').charAt(0).toUpperCase();
+                  })()}
                 </span>
               </div>
               <div>
                 <h3 style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem', fontWeight: '700' }}>
-                  {activeChat.participants.find((p) => p._id !== user._id)?.name}
+                  {(() => {
+                    const getUserId = (u) => (typeof u === 'string' ? u : (u._id || u.id));
+                    const currentUserId = getUserId(user);
+                    const activeOther = activeChat.participants.find(p => String(getUserId(p)) !== String(currentUserId)) || activeChat.participants[0] || {};
+                    return activeOther.name || 'Unknown User';
+                  })()}
                 </h3>
                 {activeChat.product && (
                   <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.78rem' }}>

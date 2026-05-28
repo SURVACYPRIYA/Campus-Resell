@@ -48,7 +48,45 @@ function App() {
       <NotificationProvider>
       <Router>
         <div className="app-container">
-        <Toaster position="top-center" />
+        <Toaster 
+          position="top-center" 
+          toastOptions={{
+            duration: 3500,
+            icon: '🔔',
+            style: {
+              background: '#ffffff',
+              color: '#233559',
+              border: '2px solid var(--primary)',
+              padding: '12px 24px',
+              borderRadius: '50px',
+              fontWeight: '600',
+              fontSize: '0.95rem',
+              boxShadow: '0 8px 24px rgba(193, 38, 50, 0.15)',
+            },
+            success: {
+              icon: '✨',
+              style: {
+                border: '2px solid #10b981',
+                boxShadow: '0 8px 24px rgba(16, 185, 129, 0.15)',
+              },
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#ffffff',
+              },
+            },
+            error: {
+              icon: '🚨',
+              style: {
+                border: '2px solid #ef4444',
+                boxShadow: '0 8px 24px rgba(239, 68, 68, 0.15)',
+              },
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#ffffff',
+              },
+            }
+          }}
+        />
         <Navbar />
         <main className="main-content">
           <Routes>
