@@ -5,6 +5,7 @@
   "scripts": {
     "start": "npm --prefix Backend start",
     "dev": "npm --prefix Backend run dev",
-    "install": "npm install && npm --prefix Backend install"
+    "install": "npm install && npm --prefix Backend install",
+    "postinstall": "npm --prefix Backend install"
   }
 }
