@@ -184,3 +184,27 @@ select.input-glass {
   opacity: 0;
   animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+/* --- Responsiveness --- */
+@media (max-width: 768px) {
+  .navbar-top-banner {
+    display: none !important;
+  }
+  
+  .navbar-links {
+    gap: 15px !important;
+  }
+  
+  .nav-link-text {
+    display: none !important;
+  }
+
+  .brand-logo-container span {
+    font-size: 0.9rem !important;
+  }
+
+  .brand-logo-container svg {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}

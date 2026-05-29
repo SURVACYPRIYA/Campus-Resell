@@ -40,26 +40,23 @@ const Navbar = () => {
       boxShadow: '0 4px 15px rgba(35, 53, 89, 0.05)'
     }}>
       {/* Top Academic Info Strip */}
-      <div style={{
-        background: '#233559',
-        color: '#e2e8f0',
-        fontSize: '0.75rem',
-        fontWeight: '500',
-        letterSpacing: '0.05em',
-        padding: '8px 40px',
-        textAlign: 'center',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '10px'
-      }}>
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-          <span>📞 Toll Free: 81 81 057 057</span>
+      <div className="navbar-top-banner" style={{
+          width: '100%',
+          background: '#233559', // Changed from var(--primary) to navy blue
+          color: '#ffffff',
+          padding: '6px 20px',
+          fontSize: '0.75rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.1)'
+        }}>
+        <div className="banner-contact" style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <span>📞 Toll-free: 81 81 057 057</span>
           <span style={{ opacity: 0.5 }}>|</span>
           <span>✉️ info@anurag.edu.in</span>
         </div>
-        <span style={{ color: 'var(--secondary)', fontWeight: '600' }}>🎓 OFFICIAL ANURAG PEER-TO-PEER PORTAL</span>
+        <span className="banner-title" style={{ color: 'var(--secondary)', fontWeight: '500', fontSize: '0.75rem', letterSpacing: '0.02em' }}>🎓 Official Anurag Peer-to-Peer Portal</span>
       </div>
 
       {/* Main Double-Skewed Navbar Container */}
@@ -96,9 +93,9 @@ const Navbar = () => {
 
         {/* Content Layer */}
         {/* Left: Official Logo */}
-        <div style={{ position: 'relative', zIndex: 1, height: '48px', display: 'flex', alignItems: 'center', marginLeft: '-10px' }}>
-          <div className="brand-logo-container">
-            <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div style={{ position: 'relative', zIndex: 1, height: '48px', display: 'flex', alignItems: 'center', marginLeft: '-10px', flexShrink: 0 }}>
+          <div className="brand-logo-container" style={{ flexShrink: 0 }}>
+            <svg width="42" height="42" style={{ flexShrink: 0 }} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M 50 15 L 85 35 L 85 75 L 50 95 L 15 75 L 15 35 Z" stroke="#C12632" strokeWidth="6" strokeLinejoin="round"/>
               <path d="M 15 35 L 50 55 L 85 35 M 50 55 V 95" stroke="#C12632" strokeWidth="6" strokeLinejoin="round"/>
               <path d="M 35 45 L 50 30 L 65 45 M 50 30 V 50" stroke="#233559" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -134,17 +131,17 @@ const Navbar = () => {
         </div>
 
         {/* Right: Navigation Links */}
-        <div style={{ 
+        <div className="navbar-links" style={{ 
           position: 'relative', 
           zIndex: 1, 
           display: 'flex', 
           gap: '20px', 
           alignItems: 'center' 
         }}>
-          <Link to="/" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>Home</Link>
-          <Link to="/marketplace" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>Marketplace</Link>
+          <Link to="/" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}><span className="nav-link-text">Home</span></Link>
+          <Link to="/marketplace" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}><span className="nav-link-text">Marketplace</span></Link>
           <Link to="/sell" className="nav-link" style={{ color: '#233559', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>
-            <PlusCircle size={18} style={{ color: 'var(--primary)' }} /> <span>Sell</span>
+            <PlusCircle size={18} style={{ color: 'var(--primary)' }} /> <span className="nav-link-text">Sell</span>
           </Link>
           <Link to="/chat" className="nav-link" style={{ position: 'relative', color: '#233559', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
