@@ -35,7 +35,8 @@ const io = new Server(server, {
             'http://localhost:5174'
         ],
 
-        methods: ['GET', 'POST']
+        methods: ['GET', 'POST'],
+        credentials: true
     }
 });
 
