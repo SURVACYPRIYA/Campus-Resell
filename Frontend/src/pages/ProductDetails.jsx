@@ -12,7 +12,8 @@ import {
   CheckCircle2,
   Edit3,
   Star,
-  Trash2
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CameraModal from '../components/CameraModal';
@@ -59,6 +60,9 @@ const ProductDetails = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [photoToDeleteIndex, setPhotoToDeleteIndex] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
 
   const handleUpdatePhoto = (file) => {
     const reader = new FileReader();
@@ -448,28 +452,74 @@ const ProductDetails = () => {
     }
   };
 
-  const handleReport = async () => {
+  const handleReport = () => {
     if (!user) return navigate('/login');
+    setReportReason('');
+    setShowReportModal(true);
+  };
 
-    const reason = window.prompt(
-      'Reason for reporting this product:'
-    );
-
-    if (!reason) return;
-
+  const confirmReport = async () => {
+    if (!reportReason.trim()) return;
+    setIsSubmittingReport(true);
     try {
       await axios.post(
         '/api/reports',
         {
           reportedProductId: product._id,
           reportedUserId: product.seller._id,
-          reason
+          reason: reportReason
         }
       );
+      toast.custom((t) => (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+            padding: '14px 22px',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            border: '1px solid rgba(245, 158, 11, 0.2)',
+            opacity: t.visible ? 1 : 0,
+            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            cursor: 'pointer'
+          }}
+          onClick={() => toast.dismiss(t.id)}
+        >
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(245, 158, 11, 0.3)'
+          }}>
+            <AlertTriangle size={20} color="white" />
+          </div>
 
-      toast.success('Report submitted successfully.');
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+              Report Submitted
+            </span>
+            <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px', maxWidth: '220px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {product.title}
+            </span>
+          </div>
+        </div>
+      ), { duration: 3000 });
     } catch (err) {
       console.error(err);
+      toast.error('Failed to submit report.');
+    } finally {
+      setIsSubmittingReport(false);
+      setShowReportModal(false);
+      setReportReason('');
     }
   };
 
@@ -580,6 +630,97 @@ const ProductDetails = () => {
                 onMouseLeave={e => e.currentTarget.style.background = '#ef4444'}
               >
                 Yes, Delete It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* REPORT PRODUCT MODAL */}
+      {showReportModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            padding: '30px',
+            width: '90%',
+            maxWidth: '440px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            transform: 'scale(1)',
+            animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#fef3c7', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <AlertTriangle size={24} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Report Product</h3>
+                <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Help us keep the marketplace safe.</p>
+              </div>
+            </div>
+
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>
+              Reason for reporting
+            </label>
+            <textarea
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              placeholder="Describe why you are reporting this product..."
+              rows={4}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                border: '2px solid #e2e8f0',
+                fontSize: '0.9rem',
+                fontFamily: 'inherit',
+                resize: 'vertical',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#f59e0b'}
+              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+              autoFocus
+            />
+            
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <button 
+                onClick={() => { setShowReportModal(false); setReportReason(''); }}
+                style={{ padding: '10px 20px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '12px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#e2e8f0'}
+                onMouseLeave={e => e.currentTarget.style.background = '#f1f5f9'}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmReport}
+                disabled={!reportReason.trim() || isSubmittingReport}
+                style={{ 
+                  padding: '10px 20px', 
+                  background: !reportReason.trim() ? '#cbd5e1' : '#f59e0b', 
+                  color: 'white', 
+                  border: 'none', 
+                  borderRadius: '12px', 
+                  fontWeight: '600', 
+                  cursor: !reportReason.trim() ? 'not-allowed' : 'pointer', 
+                  transition: 'background 0.2s',
+                  opacity: isSubmittingReport ? 0.7 : 1
+                }}
+                onMouseEnter={e => { if (reportReason.trim()) e.currentTarget.style.background = '#d97706'; }}
+                onMouseLeave={e => { if (reportReason.trim()) e.currentTarget.style.background = '#f59e0b'; }}
+              >
+                {isSubmittingReport ? 'Submitting...' : 'Submit Report'}
               </button>
             </div>
           </div>
