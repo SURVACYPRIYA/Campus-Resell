@@ -4,13 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import axios from '../axios';
 import {
   LayoutDashboard, Package, ShoppingBag, MessageSquare,
-  PlusCircle, TrendingUp, User, LogOut, ChevronRight
+  PlusCircle, TrendingUp, User, LogOut, ChevronRight, Heart
 } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ listings: 0, sold: 0, purchases: 0 });
+  const [stats, setStats] = useState({ listings: 0, sold: 0, purchases: 0, wishlist: 0 });
   const [recentListings, setRecentListings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,14 +22,16 @@ const Dashboard = () => {
     if (!user) return;
     const fetchData = async () => {
       try {
-        const [resListings, resPurchases] = await Promise.all([
+        const [resListings, resPurchases, resWishlist] = await Promise.all([
           axios.get(`/api/products?seller=${user._id}&status=all`),
           axios.get(`/api/products?buyer=${user._id}&status=sold`),
+          axios.get('/api/users/wishlist'),
         ]);
         const listings = resListings.data.data.products || [];
         const purchases = resPurchases.data.data.products || [];
+        const wishlist = resWishlist.data.data.wishlist || [];
         const sold = listings.filter(p => p.status === 'sold').length;
-        setStats({ listings: listings.length, sold, purchases: purchases.length });
+        setStats({ listings: listings.length, sold, purchases: purchases.length, wishlist: wishlist.length });
         setRecentListings(listings.slice(0, 3));
       } catch (err) {
         console.error(err);
@@ -43,9 +45,10 @@ const Dashboard = () => {
   const handleLogout = () => { if (window.confirm('Are you sure you want to logout?')) { logout(); navigate('/login'); } };
 
   const statCards = [
-    { icon: <Package size={28} />, label: 'Total Listings', value: stats.listings, color: '#3b82f6', bg: 'rgba(59,130,246,0.08)' },
-    { icon: <TrendingUp size={28} />, label: 'Items Sold', value: stats.sold, color: '#16a34a', bg: 'rgba(22,163,74,0.08)' },
-    { icon: <ShoppingBag size={28} />, label: 'Purchases', value: stats.purchases, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
+    { icon: <Package size={28} />, label: 'Total Listings', value: stats.listings, color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', to: '/my-listings' },
+    { icon: <TrendingUp size={28} />, label: 'Items Sold', value: stats.sold, color: '#16a34a', bg: 'rgba(22,163,74,0.08)', to: '/my-listings' },
+    { icon: <ShoppingBag size={28} />, label: 'Purchases', value: stats.purchases, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', to: '/purchases' },
+    { icon: <Heart size={28} />, label: 'Wishlist', value: stats.wishlist, color: '#ef4444', bg: 'rgba(239,68,68,0.08)', to: '/wishlist' },
   ];
 
   const quickLinks = [
@@ -53,6 +56,7 @@ const Dashboard = () => {
     { icon: <Package size={20} />, label: 'My Listings', to: '/my-listings', color: '#3b82f6' },
     { icon: <ShoppingBag size={20} />, label: 'My Purchases', to: '/purchases', color: '#f59e0b' },
     { icon: <MessageSquare size={20} />, label: 'Messages', to: '/chat', color: '#8b5cf6' },
+    { icon: <Heart size={20} />, label: 'Wishlist', to: '/wishlist', color: '#ef4444' },
     { icon: <User size={20} />, label: 'Profile', to: '/profile', color: '#16a34a' },
   ];
 
@@ -110,8 +114,29 @@ const Dashboard = () => {
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '36px' }}>
         {statCards.map((card, i) => (
-          <div key={i} className="glass-card" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ background: card.bg, color: card.color, padding: '14px', borderRadius: '12px' }}>
+          <Link
+            key={i}
+            to={card.to}
+            className="glass-card"
+            style={{
+              padding: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              textDecoration: 'none',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = `0 8px 30px ${card.color}22`;
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '';
+            }}
+          >
+            <div style={{ background: card.bg, color: card.color, padding: '14px', borderRadius: '12px', flexShrink: 0 }}>
               {card.icon}
             </div>
             <div>
@@ -120,7 +145,7 @@ const Dashboard = () => {
                 {loading ? '—' : card.value}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -139,7 +164,7 @@ const Dashboard = () => {
                 color: 'var(--text-main)', background: 'rgba(0,0,0,0.02)',
                 border: '1px solid var(--glass-border)', transition: 'all 0.2s'
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = `rgba(${link.color.includes('#3b') ? '59,130,246' : link.color.includes('#C0') ? '192,37,53' : link.color.includes('#f5') ? '245,158,11' : link.color.includes('#8b') ? '139,92,246' : '22,163,74'},0.06)`; }}
+              onMouseEnter={e => { e.currentTarget.style.background = `rgba(${link.color.includes('#3b') ? '59,130,246' : link.color.includes('#C0') ? '192,37,53' : link.color.includes('#f5') ? '245,158,11' : link.color.includes('#8b') ? '139,92,246' : link.color.includes('#ef') ? '239,68,68' : '22,163,74'},0.06)`; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

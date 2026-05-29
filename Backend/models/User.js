@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'
     },
+    wishlist: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Product'
+    }],
     resetPasswordToken: String,
     resetPasswordExpires: Date
 }, {

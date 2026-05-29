@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MessageSquare, PlusCircle, HelpCircle, BookOpen, Mail, ChevronDown, LifeBuoy, LogOut } from 'lucide-react';
+import { ThemeContext } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { toast } from 'react-hot-toast';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const { globalUnread } = useNotification();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -307,6 +309,7 @@ const Navbar = () => {
                       { icon: '🏠', label: 'Dashboard', path: '/dashboard' },
                       { icon: '📦', label: 'My Listings', path: '/my-listings' },
                       { icon: '🛍️', label: 'Purchases', path: '/purchases' },
+                      { icon: '❤️', label: 'Wishlist', path: '/wishlist' },
                     ].map((item) => (
                       <button
                         key={item.path}

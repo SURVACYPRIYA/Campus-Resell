@@ -7,7 +7,8 @@ import {
   Loader2,
   ArrowLeft,
   Share2,
-  Camera
+  Camera,
+  Heart
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CameraModal from '../components/CameraModal';
@@ -50,6 +51,8 @@ const ProductDetails = () => {
   const [ratingInput, setRatingInput] = useState(0);
   const [reviewTextInput, setReviewTextInput] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   const handleUpdatePhoto = (file) => {
     const reader = new FileReader();
@@ -94,6 +97,36 @@ const ProductDetails = () => {
         .catch(err => console.error('Failed to fetch seller rating', err));
     }
   }, [product?.seller?._id, product?.rating]);
+
+  // Check wishlist status when product loads
+  useEffect(() => {
+    if (!product || !user) return;
+    const checkWishlist = async () => {
+      try {
+        const res = await axios.get('/api/users/wishlist');
+        const ids = res.data.data.wishlist.map(p => p._id);
+        setIsWishlisted(ids.includes(product._id));
+      } catch (err) {
+        console.error('Failed to check wishlist', err);
+      }
+    };
+    checkWishlist();
+  }, [product?._id, user]);
+
+  const handleToggleWishlist = async () => {
+    if (!user) return navigate('/login');
+    setWishlistLoading(true);
+    try {
+      const res = await axios.post(`/api/users/wishlist/${product._id}`);
+      setIsWishlisted(res.data.isWishlisted);
+      toast.success(res.data.isWishlisted ? 'Added to wishlist ❤️' : 'Removed from wishlist');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update wishlist');
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (product && !isEditing) {
@@ -469,7 +502,33 @@ const ProductDetails = () => {
             </div>
 
             {/* ACTION BUTTONS */}
-            <div style={{ display: 'flex', gap: '15px' }}>
+            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+              {/* Wishlist Heart */}
+              {!isSeller && (
+                <button
+                  onClick={handleToggleWishlist}
+                  disabled={wishlistLoading}
+                  style={{
+                    background: isWishlisted ? 'rgba(239,68,68,0.08)' : 'transparent',
+                    border: isWishlisted ? '1.5px solid rgba(239,68,68,0.3)' : 'none',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: isWishlisted ? '#ef4444' : 'var(--text-muted)',
+                    cursor: wishlistLoading ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  <Heart size={22} fill={isWishlisted ? '#ef4444' : 'none'} />
+                </button>
+              )}
+
               <button
                 onClick={handleShare}
                 style={{

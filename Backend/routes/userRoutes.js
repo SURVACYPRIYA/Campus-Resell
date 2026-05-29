@@ -6,4 +6,9 @@ const router = express.Router();
 
 router.get('/:id/rating', userController.getUserRating);
 
+// Wishlist routes (Protected)
+router.use(protect);
+router.get('/wishlist', userController.getWishlist);
+router.post('/wishlist/:productId', userController.toggleWishlist);
+
 module.exports = router;

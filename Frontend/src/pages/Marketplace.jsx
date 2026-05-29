@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import axios from '../axios';
-import { Search, Loader2, Share2 } from 'lucide-react';
+import { Search, Loader2, Share2, Heart } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +13,7 @@ const Marketplace = () => {
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [wishlistIds, setWishlistIds] = useState(new Set());
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -73,6 +74,40 @@ const Marketplace = () => {
     fetchProducts();
   }, [category, searchTerm]);
 
+  // Fetch wishlist on load
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      if (!user) return;
+      try {
+        const res = await axios.get('/api/users/wishlist');
+        const ids = new Set(res.data.data.wishlist.map(p => p._id));
+        setWishlistIds(ids);
+      } catch (err) {
+        console.error('Failed to fetch wishlist', err);
+      }
+    };
+    fetchWishlist();
+  }, [user]);
+
+  const handleToggleWishlist = async (productId, title) => {
+    try {
+      const res = await axios.post(`/api/users/wishlist/${productId}`);
+      const isWishlisted = res.data.isWishlisted;
+      setWishlistIds(prev => {
+        const next = new Set(prev);
+        if (isWishlisted) {
+          next.add(productId);
+        } else {
+          next.delete(productId);
+        }
+        return next;
+      });
+      toast.success(isWishlisted ? `Added "${title}" to wishlist` : `Removed "${title}" from wishlist`);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update wishlist');
+    }
+  };
 
   const handleShare = (product) => {
     const url = `${window.location.origin}/product/${product._id}`;
@@ -145,7 +180,37 @@ const Marketplace = () => {
           {products.map((product, index) => (
             <div key={product._id} className="glass-card animate-fade-in" style={{ padding: '15px', display: 'flex', flexDirection: 'column', animationDelay: `${index * 0.08}s` }}>
               {/* PRODUCT IMAGE */}
-              <div style={{ width: '100%', height: '200px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '15px', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '200px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '15px', overflow: 'hidden', position: 'relative' }}>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleToggleWishlist(product._id, product.title);
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    zIndex: 5,
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.9)',
+                    border: 'none',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: wishlistIds.has(product._id) ? '#ef4444' : 'var(--text-muted)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                  title={wishlistIds.has(product._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                >
+                  <Heart size={18} fill={wishlistIds.has(product._id) ? '#ef4444' : 'none'} />
+                </button>
                 <img src={product.images[0] || fallbackImage} alt={product.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = fallbackImage; }} />
               </div>
 

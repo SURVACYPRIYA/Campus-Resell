@@ -30,9 +30,10 @@ const server = http.createServer(app);
 // SOCKET.IO
 const io = new Server(server, {
     cors: {
-        origin:
-            process.env.FRONTEND_URL ||
-            'http://localhost:5174',
+        origin: process.env.FRONTEND_URL || [
+            'http://localhost:5173',
+            'http://localhost:5174'
+        ],
 
         methods: ['GET', 'POST']
     }
@@ -44,9 +45,10 @@ app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(cookieParser());
 
 app.use(cors({
-    origin:
-        process.env.FRONTEND_URL ||
-        'http://localhost:5174',
+    origin: process.env.FRONTEND_URL || [
+        'http://localhost:5173',
+        'http://localhost:5174'
+    ],
 
     credentials: true
 }));
