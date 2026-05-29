@@ -13,6 +13,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSupportMenu, setShowSupportMenu] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const menuItemStyle = {
     width: '100%',
@@ -345,39 +346,7 @@ const Navbar = () => {
                     <button
                       onClick={() => {
                         setShowProfileMenu(false);
-                        toast.custom((t) => (
-                          <div style={{
-                            background: '#ffffff', padding: '20px 24px', borderRadius: '16px',
-                            boxShadow: '0 10px 40px rgba(35, 53, 89, 0.2)', display: 'flex', flexDirection: 'column', gap: '16px',
-                            border: '1px solid var(--glass-border)', opacity: t.visible ? 1 : 0,
-                            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-10px)',
-                            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)', width: '320px', pointerEvents: 'auto'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                              <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
-                                <LogOut size={20} />
-                              </div>
-                              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ fontWeight: '700', color: '#233559', fontSize: '1.05rem' }}>Log Out</span>
-                                <span style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '2px' }}>Are you sure you want to log out?</span>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-                              <button
-                                onClick={() => toast.dismiss(t.id)}
-                                style={{ flex: 1, padding: '10px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = '#e2e8f0'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = '#f1f5f9'}
-                              >Cancel</button>
-                              <button
-                                onClick={() => { toast.dismiss(t.id); logout(); }}
-                                style={{ flex: 1, padding: '10px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = '#dc2626'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = '#ef4444'}
-                              >Yes, Log Out</button>
-                            </div>
-                          </div>
-                        ), { duration: Infinity, position: 'top-center', id: 'logout-toast' });
+                        setShowLogoutModal(true);
                       }}
                       style={{
                         width: '100%', background: 'none', border: 'none', textAlign: 'left',
@@ -441,6 +410,61 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      
+      {/* LOGOUT CONFIRMATION MODAL */}
+      {showLogoutModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            padding: '30px',
+            width: '90%',
+            maxWidth: '400px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            transform: 'scale(1)',
+            animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <LogOut size={24} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Log Out</h3>
+                <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Are you sure you want to log out of your account?</p>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '30px' }}>
+              <button 
+                onClick={() => setShowLogoutModal(false)}
+                style={{ padding: '10px 20px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '12px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#e2e8f0'}
+                onMouseLeave={e => e.currentTarget.style.background = '#f1f5f9'}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => { setShowLogoutModal(false); logout(); }}
+                style={{ padding: '10px 20px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '12px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#dc2626'}
+                onMouseLeave={e => e.currentTarget.style.background = '#ef4444'}
+              >
+                Yes, Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

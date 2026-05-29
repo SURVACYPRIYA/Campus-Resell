@@ -10,7 +10,9 @@ import {
   Camera,
   Heart,
   CheckCircle2,
-  Edit3
+  Edit3,
+  Star,
+  Trash2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CameraModal from '../components/CameraModal';
@@ -56,6 +58,7 @@ const ProductDetails = () => {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [photoToDeleteIndex, setPhotoToDeleteIndex] = useState(null);
 
   const handleUpdatePhoto = (file) => {
     const reader = new FileReader();
@@ -65,7 +68,7 @@ const ProductDetails = () => {
         const base64 = reader.result;
         const res = await axios.patch(
           `/api/products/${product._id}`,
-          { images: [base64] }
+          { images: [...(product.images || []), base64] }
         );
         setProduct(res.data.data.product);
         setShowCamera(false);
@@ -75,6 +78,39 @@ const ProductDetails = () => {
         toast.error('Failed to update photo');
       }
     };
+  };
+
+  const handleDeletePhoto = (indexToDelete, e) => {
+    e.stopPropagation();
+    if (!product.images || product.images.length <= 1) {
+      toast.error("You must have at least one photo.");
+      return;
+    }
+    setPhotoToDeleteIndex(indexToDelete);
+  };
+
+  const confirmDeletePhoto = async () => {
+    if (photoToDeleteIndex === null) return;
+    
+    try {
+      const newImages = product.images.filter((_, idx) => idx !== photoToDeleteIndex);
+      const res = await axios.patch(
+        `/api/products/${product._id}`,
+        { images: newImages }
+      );
+      setProduct(res.data.data.product);
+      if (currentImageIdx === photoToDeleteIndex) {
+        setCurrentImageIdx(Math.max(0, photoToDeleteIndex - 1));
+      } else if (currentImageIdx > photoToDeleteIndex) {
+        setCurrentImageIdx(currentImageIdx - 1);
+      }
+      toast.success("Photo deleted successfully");
+    } catch (err) {
+      console.error('Error deleting photo:', err);
+      toast.error('Failed to delete photo');
+    } finally {
+      setPhotoToDeleteIndex(null);
+    }
   };
 
   useEffect(() => {
@@ -140,7 +176,7 @@ const ProductDetails = () => {
       setEditStatus(product.status || 'available');
       setEditBuyer(product.buyer || '');
     }
-    
+
     if (isEditing && isSeller) {
       const fetchBuyers = async () => {
         try {
@@ -160,7 +196,59 @@ const ProductDetails = () => {
     try {
       const res = await axios.post(`/api/products/${product._id}/review`, { rating: ratingInput, reviewText: reviewTextInput });
       setProduct(res.data.data.product);
-      toast.success('Review submitted successfully!');
+      toast.custom((t) => (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #451a03, #78350f)',
+            padding: '14px 22px',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            border: '1px solid rgba(245, 158, 11, 0.2)',
+            opacity: t.visible ? 1 : 0,
+            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            cursor: 'pointer'
+          }}
+          onClick={() => toast.dismiss(t.id)}
+        >
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(245, 158, 11, 0.3)'
+          }}>
+            <Star size={20} fill="white" />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '160px' }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+              Review Submitted
+            </span>
+            <span style={{ color: '#fde68a', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+              Thanks for your feedback!
+            </span>
+          </div>
+
+          <div style={{
+            display: 'flex',
+            gap: '2px',
+            flexShrink: 0
+          }}>
+            {[1, 2, 3, 4, 5].map((s) => (
+              <Star key={s} size={14} fill={s <= ratingInput ? '#fbbf24' : 'none'} color={s <= ratingInput ? '#fbbf24' : '#78716c'} />
+            ))}
+          </div>
+        </div>
+      ), { duration: 4000 });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to submit review');
     } finally {
@@ -229,7 +317,7 @@ const ProductDetails = () => {
           }}>
             <CheckCircle2 size={20} />
           </div>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '160px' }}>
             <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
               Update Successful
@@ -362,9 +450,65 @@ const ProductDetails = () => {
       style={{
         padding: '40px 20px',
         maxWidth: '1000px',
-        margin: '0 auto'
+        margin: '0 auto',
+        position: 'relative'
       }}
     >
+      {/* PHOTO DELETE CONFIRMATION MODAL */}
+      {photoToDeleteIndex !== null && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            padding: '30px',
+            width: '90%',
+            maxWidth: '400px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            transform: 'scale(1)',
+            animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Trash2 size={24} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Delete Photo</h3>
+                <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Are you sure you want to remove this image from your listing?</p>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '30px' }}>
+              <button 
+                onClick={() => setPhotoToDeleteIndex(null)}
+                style={{ padding: '10px 20px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '12px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#e2e8f0'}
+                onMouseLeave={e => e.currentTarget.style.background = '#f1f5f9'}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDeletePhoto}
+                style={{ padding: '10px 20px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '12px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#dc2626'}
+                onMouseLeave={e => e.currentTarget.style.background = '#ef4444'}
+              >
+                Yes, Delete It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* BACK BUTTON */}
       <button
         onClick={() => navigate(-1)}
@@ -420,7 +564,7 @@ const ProductDetails = () => {
               <button onClick={() => fileInputRef.current.click()} className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', background: '#333' }}>
                 Upload
               </button>
-              <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={(e) => { if(e.target.files[0]) handleUpdatePhoto(e.target.files[0]) }} />
+              <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={(e) => { if (e.target.files[0]) handleUpdatePhoto(e.target.files[0]) }} />
             </div>
           )}
           <img
@@ -429,7 +573,8 @@ const ProductDetails = () => {
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover'
+              objectFit: 'contain',
+              padding: '20px'
             }}
             onError={(e) => {
               e.target.onerror = null;
@@ -450,26 +595,52 @@ const ProductDetails = () => {
               padding: '0 20px'
             }}>
               {product.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentImageIdx(idx)}
-                  style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    border: currentImageIdx === idx ? '3px solid var(--primary)' : '2px solid rgba(255,255,255,0.8)',
-                    cursor: 'pointer',
-                    padding: 0,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-                    transition: 'transform 0.2s, border-color 0.2s',
-                    transform: currentImageIdx === idx ? 'scale(1.05)' : 'scale(1)'
-                  }}
-                  onMouseEnter={(e) => { if(currentImageIdx !== idx) e.currentTarget.style.transform = 'scale(1.05)' }}
-                  onMouseLeave={(e) => { if(currentImageIdx !== idx) e.currentTarget.style.transform = 'scale(1)' }}
-                >
-                  <img src={img} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </button>
+                <div key={idx} style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => setCurrentImageIdx(idx)}
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: currentImageIdx === idx ? '3px solid var(--primary)' : '2px solid rgba(255,255,255,0.8)',
+                      cursor: 'pointer',
+                      padding: 0,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                      transition: 'transform 0.2s, border-color 0.2s',
+                      transform: currentImageIdx === idx ? 'scale(1.05)' : 'scale(1)'
+                    }}
+                    onMouseEnter={(e) => { if (currentImageIdx !== idx) e.currentTarget.style.transform = 'scale(1.05)' }}
+                    onMouseLeave={(e) => { if (currentImageIdx !== idx) e.currentTarget.style.transform = 'scale(1)' }}
+                  >
+                    <img src={img} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </button>
+                  {isSeller && (
+                    <button
+                      onClick={(e) => handleDeletePhoto(idx, e)}
+                      style={{
+                        position: 'absolute',
+                        top: '-6px',
+                        right: '-6px',
+                        background: '#ef4444',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+                        zIndex: 10
+                      }}
+                      title="Delete Photo"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           )}
@@ -818,7 +989,7 @@ const ProductDetails = () => {
               <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '20px', color: '#233559' }}>
                 Reviews for {product.seller.name}
               </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 {sellerRating.reviews.map(review => (
                   <div key={review._id} style={{ padding: '20px', background: 'rgba(255,255,255,0.6)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>

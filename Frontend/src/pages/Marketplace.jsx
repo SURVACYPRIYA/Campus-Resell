@@ -134,7 +134,7 @@ const Marketplace = () => {
           }}>
             <Heart size={20} fill={isWishlisted ? 'white' : 'none'} color={isWishlisted ? 'white' : '#f8fafc'} />
           </div>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
             <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
               {isWishlisted ? 'Saved to Wishlist' : 'Removed from Wishlist'}
@@ -194,19 +194,19 @@ const Marketplace = () => {
                 setSearchParams(next, { replace: true });
               }}
               style={{
-              padding: '8px 20px',
+                padding: '8px 20px',
 
-              borderRadius: '20px',
-              border: category === cat ? '1px solid var(--primary)' : '1px solid var(--glass-border)',
-              background: category === cat ? 'var(--primary)' : '#ffffff',
-              color: category === cat ? '#ffffff' : 'var(--text-main)',
-              fontWeight: '600',
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.2s',
-              boxShadow: category === cat ? '0 4px 10px rgba(193, 38, 50, 0.15)' : 'none'
-            }}>{cat}</button>
+                borderRadius: '20px',
+                border: category === cat ? '1px solid var(--primary)' : '1px solid var(--glass-border)',
+                background: category === cat ? 'var(--primary)' : '#ffffff',
+                color: category === cat ? '#ffffff' : 'var(--text-main)',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s',
+                boxShadow: category === cat ? '0 4px 10px rgba(193, 38, 50, 0.15)' : 'none'
+              }}>{cat}</button>
           ))}
         </div>
       </div>
