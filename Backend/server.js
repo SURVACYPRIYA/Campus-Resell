@@ -77,6 +77,12 @@ io.on('connection', (socket) => {
         socket.id
     );
 
+    // SETUP PERSONAL ROOM
+    socket.on('setup', (userId) => {
+        socket.join(userId);
+        console.log(`User ${userId} joined personal room`);
+    });
+
     // JOIN CHAT ROOM
     socket.on('join_chat', (chatId) => {
 
@@ -107,12 +113,13 @@ io.on('connection', (socket) => {
                     });
 
                 // UPDATE LAST MESSAGE
-                await Chat.findByIdAndUpdate(
+                const updatedChat = await Chat.findByIdAndUpdate(
                     data.chatId,
                     {
                         lastMessage:
                             newMessage._id
-                    }
+                    },
+                    { new: true }
                 );
 
                 // POPULATE SENDER
@@ -120,6 +127,22 @@ io.on('connection', (socket) => {
                     await Message.findById(
                         newMessage._id
                     ).populate('sender');
+
+                // NOTIFY OTHER PARTICIPANTS IN THEIR PERSONAL ROOMS
+                if (updatedChat && updatedChat.participants) {
+                    updatedChat.participants.forEach(participantId => {
+                        if (participantId.toString() !== data.senderId.toString()) {
+                            io.to(participantId.toString()).emit('new_message_notification', {
+                                _id: populatedMessage._id,
+                                chatId: data.chatId,
+                                sender: populatedMessage.sender,
+                                content: populatedMessage.content,
+                                read: populatedMessage.read,
+                                createdAt: populatedMessage.createdAt
+                            });
+                        }
+                    });
+                }
 
                 // SEND TO EVERYONE
                 io.to(data.chatId).emit(

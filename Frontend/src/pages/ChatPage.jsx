@@ -143,49 +143,7 @@ const ChatPage = () => {
            markRead(1);
         }
       } else {
-        // Show premium custom toast notification instead of default tick
-        toast.custom((t) => (
-          <div
-            style={{
-              background: '#ffffff',
-              padding: '12px 20px',
-              borderRadius: '50px',
-              boxShadow: '0 8px 24px rgba(35, 53, 89, 0.15)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              border: '2px solid var(--primary)',
-              opacity: t.visible ? 1 : 0,
-              transform: t.visible ? 'translateY(0)' : 'translateY(-20px)',
-              transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-              cursor: 'pointer'
-            }}
-            onClick={() => toast.dismiss(t.id)}
-          >
-            <div style={{
-              width: '28px',
-              height: '28px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, var(--primary), #8b1a25)',
-              color: 'white',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '800',
-              fontSize: '0.85rem'
-            }}>
-              {data.sender?.name?.charAt(0).toUpperCase() || '💬'}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontWeight: '700', color: '#233559', fontSize: '0.9rem', lineHeight: '1.2' }}>
-                {data.sender?.name || 'Someone'}
-              </span>
-              <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '500' }}>
-                Sent you a new message
-              </span>
-            </div>
-          </div>
-        ), { duration: 4000 });
+        // Handled by NotificationContext globally
       }
 
       // Real-time update for the sidebar list
@@ -211,6 +169,13 @@ const ChatPage = () => {
     });
     return () => { socket.off('receive_message'); };
   }, [activeChat, user]);
+
+  useEffect(() => {
+    window.currentActiveChatId = activeChat?._id || null;
+    return () => {
+      window.currentActiveChatId = null;
+    };
+  }, [activeChat]);
 
   // AUTO-OPEN CHAT FROM PRODUCT PAGE (fires only once)
   useEffect(() => {
