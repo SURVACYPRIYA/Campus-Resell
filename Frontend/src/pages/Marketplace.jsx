@@ -102,7 +102,49 @@ const Marketplace = () => {
         }
         return next;
       });
-      toast.success(isWishlisted ? `Added "${title}" to wishlist` : `Removed "${title}" from wishlist`);
+      toast.custom((t) => (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+            padding: '14px 22px',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            border: `1px solid ${isWishlisted ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.1)'}`,
+            opacity: t.visible ? 1 : 0,
+            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            cursor: 'pointer'
+          }}
+          onClick={() => toast.dismiss(t.id)}
+        >
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: isWishlisted ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #64748b, #475569)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: isWishlisted ? '0 4px 10px rgba(239, 68, 68, 0.3)' : 'none'
+          }}>
+            <Heart size={20} fill={isWishlisted ? 'white' : 'none'} color={isWishlisted ? 'white' : '#f8fafc'} />
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+              {isWishlisted ? 'Saved to Wishlist' : 'Removed from Wishlist'}
+            </span>
+            <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px', maxWidth: '220px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {title}
+            </span>
+          </div>
+        </div>
+      ), { duration: 3000 });
     } catch (err) {
       console.error(err);
       toast.error('Failed to update wishlist');
