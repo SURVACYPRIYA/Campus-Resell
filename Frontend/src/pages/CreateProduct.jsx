@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import axios from '../axios';
-import { IndianRupee, Tag, Loader2, X, Camera, ImagePlus, Link, ZoomIn } from 'lucide-react';
+import { IndianRupee, Tag, Loader2, X, Camera, ImagePlus, Link, ZoomIn, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 /* Required star */
@@ -203,6 +203,62 @@ const CreateProduct = () => {
         '/api/products',
         { ...formData, price: Number(formData.price), images: imageUrls }
       );
+      toast.custom((t) => (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #064e3b, #065f46)',
+            padding: '14px 22px',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            border: '1px solid rgba(16, 185, 129, 0.2)',
+            opacity: t.visible ? 1 : 0,
+            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            cursor: 'pointer'
+          }}
+          onClick={() => toast.dismiss(t.id)}
+        >
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(16, 185, 129, 0.3)'
+          }}>
+            <CheckCircle2 size={20} />
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '160px' }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+              Listing Successful
+            </span>
+            <span style={{ color: '#a7f3d0', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+              Your item is now live!
+            </span>
+          </div>
+
+          <div style={{
+            background: 'rgba(16, 185, 129, 0.15)',
+            padding: '8px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#34d399',
+            flexShrink: 0
+          }}>
+            <Tag size={22} />
+          </div>
+        </div>
+      ), { duration: 4000 });
       navigate('/marketplace');
     } catch (err) {
       console.error(err);

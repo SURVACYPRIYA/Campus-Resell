@@ -3,6 +3,7 @@ import axios from '../axios';
 import socket from '../socket';
 import { useAuth } from './AuthContext';
 import { toast } from 'react-hot-toast';
+import { MessageCircle } from 'lucide-react';
 
 const NotificationContext = createContext();
 
@@ -46,17 +47,17 @@ export const NotificationProvider = ({ children }) => {
         toast.custom((t) => (
           <div
             style={{
-              background: '#ffffff',
-              padding: '12px 20px',
-              borderRadius: '50px',
-              boxShadow: '0 8px 24px rgba(35, 53, 89, 0.15)',
+              background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+              padding: '14px 22px',
+              borderRadius: '16px',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
-              border: '2px solid var(--primary)',
+              gap: '14px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               opacity: t.visible ? 1 : 0,
-              transform: t.visible ? 'translateY(0)' : 'translateY(-20px)',
-              transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+              transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+              transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
               cursor: 'pointer'
             }}
             onClick={() => {
@@ -64,26 +65,42 @@ export const NotificationProvider = ({ children }) => {
             }}
           >
             <div style={{
-              width: '28px',
-              height: '28px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, var(--primary), #8b1a25)',
+              background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
               color: 'white',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '800',
-              fontSize: '0.85rem'
+              fontSize: '1.1rem',
+              flexShrink: 0,
+              boxShadow: '0 4px 10px rgba(37, 99, 235, 0.3)'
             }}>
-              {data.sender?.name?.charAt(0).toUpperCase() || '💬'}
+              {data.sender?.name?.charAt(0).toUpperCase() || '?'}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontWeight: '700', color: '#233559', fontSize: '0.9rem', lineHeight: '1.2' }}>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
+              <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
                 {data.sender?.name || 'Someone'}
               </span>
-              <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '500' }}>
-                Sent you a new message
+              <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+                New message received
               </span>
+            </div>
+
+            <div style={{
+              background: 'rgba(59, 130, 246, 0.15)',
+              padding: '8px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#60a5fa',
+              flexShrink: 0
+            }}>
+              <MessageCircle size={22} />
             </div>
           </div>
         ), { duration: 4000 });

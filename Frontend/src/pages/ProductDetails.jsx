@@ -8,7 +8,9 @@ import {
   ArrowLeft,
   Share2,
   Camera,
-  Heart
+  Heart,
+  CheckCircle2,
+  Edit3
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CameraModal from '../components/CameraModal';
@@ -27,6 +29,7 @@ const ProductDetails = () => {
 
   const [loading, setLoading] = useState(true);
   const [showCamera, setShowCamera] = useState(false);
+  const [currentImageIdx, setCurrentImageIdx] = useState(0);
   const fileInputRef = React.useRef(null);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -194,7 +197,62 @@ const ProductDetails = () => {
       );
       setProduct(res.data.data.product);
       setIsEditing(false);
-      toast.success('Listing updated successfully!');
+      toast.custom((t) => (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #064e3b, #065f46)',
+            padding: '14px 22px',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            border: '1px solid rgba(16, 185, 129, 0.2)',
+            opacity: t.visible ? 1 : 0,
+            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            cursor: 'pointer'
+          }}
+          onClick={() => toast.dismiss(t.id)}
+        >
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(16, 185, 129, 0.3)'
+          }}>
+            <CheckCircle2 size={20} />
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '160px' }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+              Update Successful
+            </span>
+            <span style={{ color: '#a7f3d0', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+              Your changes are saved!
+            </span>
+          </div>
+
+          <div style={{
+            background: 'rgba(16, 185, 129, 0.15)',
+            padding: '8px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#34d399',
+            flexShrink: 0
+          }}>
+            <Edit3 size={22} />
+          </div>
+        </div>
+      ), { duration: 4000 });
     } catch (err) {
       console.error('Error saving product changes:', err);
       toast.error(err.response?.data?.message || 'Failed to save changes');
@@ -366,7 +424,7 @@ const ProductDetails = () => {
             </div>
           )}
           <img
-            src={product.images[0] || fallbackImage}
+            src={product.images[currentImageIdx] || fallbackImage}
             alt={product.title}
             style={{
               width: '100%',
@@ -378,6 +436,43 @@ const ProductDetails = () => {
               e.target.src = fallbackImage;
             }}
           />
+
+          {/* THUMBNAIL GALLERY */}
+          {product.images && product.images.length > 1 && (
+            <div style={{
+              position: 'absolute',
+              bottom: '20px',
+              left: 0,
+              right: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '12px',
+              padding: '0 20px'
+            }}>
+              {product.images.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentImageIdx(idx)}
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    border: currentImageIdx === idx ? '3px solid var(--primary)' : '2px solid rgba(255,255,255,0.8)',
+                    cursor: 'pointer',
+                    padding: 0,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                    transition: 'transform 0.2s, border-color 0.2s',
+                    transform: currentImageIdx === idx ? 'scale(1.05)' : 'scale(1)'
+                  }}
+                  onMouseEnter={(e) => { if(currentImageIdx !== idx) e.currentTarget.style.transform = 'scale(1.05)' }}
+                  onMouseLeave={(e) => { if(currentImageIdx !== idx) e.currentTarget.style.transform = 'scale(1)' }}
+                >
+                  <img src={img} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* PRODUCT DETAILS */}
