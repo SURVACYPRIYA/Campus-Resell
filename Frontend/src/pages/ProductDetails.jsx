@@ -113,6 +113,83 @@ const ProductDetails = () => {
     }
   };
 
+  const handleSetCoverPhoto = async (indexToCover, e) => {
+    e.stopPropagation();
+    if (indexToCover === 0) return;
+    
+    try {
+      const newImages = [...product.images];
+      const selected = newImages.splice(indexToCover, 1)[0];
+      newImages.unshift(selected);
+      
+      const res = await axios.patch(
+        `/api/products/${product._id}`,
+        { images: newImages }
+      );
+      setProduct(res.data.data.product);
+      setCurrentImageIdx(0);
+      toast.custom((t) => (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+            padding: '14px 22px',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            border: '1px solid rgba(251, 191, 36, 0.2)',
+            opacity: t.visible ? 1 : 0,
+            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            cursor: 'pointer'
+          }}
+          onClick={() => toast.dismiss(t.id)}
+        >
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(245, 158, 11, 0.3)'
+          }}>
+            <Star size={20} fill="white" />
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '170px' }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+              Cover Photo Updated
+            </span>
+            <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+              This image is now the main photo.
+            </span>
+          </div>
+
+          <div style={{
+            background: 'rgba(251, 191, 36, 0.15)',
+            padding: '8px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fbbf24',
+            flexShrink: 0
+          }}>
+            <CheckCircle2 size={22} />
+          </div>
+        </div>
+      ), { duration: 4000 });
+    } catch (err) {
+      console.error('Error setting cover photo:', err);
+      toast.error('Failed to set cover photo');
+    }
+  };
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -616,29 +693,76 @@ const ProductDetails = () => {
                     <img src={img} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </button>
                   {isSeller && (
-                    <button
-                      onClick={(e) => handleDeletePhoto(idx, e)}
-                      style={{
-                        position: 'absolute',
-                        top: '-6px',
-                        right: '-6px',
-                        background: '#ef4444',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: '20px',
-                        height: '20px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
-                        zIndex: 10
-                      }}
-                      title="Delete Photo"
-                    >
-                      <Trash2 size={12} />
-                    </button>
+                    <>
+                      {idx === 0 ? (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            bottom: '-6px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            background: '#fbbf24',
+                            color: '#fff',
+                            fontSize: '0.6rem',
+                            fontWeight: 'bold',
+                            padding: '2px 6px',
+                            borderRadius: '10px',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                            zIndex: 10,
+                            pointerEvents: 'none'
+                          }}
+                        >
+                          Cover
+                        </div>
+                      ) : (
+                        <button
+                          onClick={(e) => handleSetCoverPhoto(idx, e)}
+                          style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            left: '-6px',
+                            background: '#fbbf24',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '20px',
+                            height: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+                            zIndex: 10
+                          }}
+                          title="Set as Cover Photo"
+                        >
+                          <Star size={12} fill="white" />
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => handleDeletePhoto(idx, e)}
+                        style={{
+                          position: 'absolute',
+                          top: '-6px',
+                          right: '-6px',
+                          background: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '20px',
+                          height: '20px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+                          zIndex: 10
+                        }}
+                        title="Delete Photo"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </>
                   )}
                 </div>
               ))}

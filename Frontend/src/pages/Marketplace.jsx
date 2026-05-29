@@ -222,7 +222,7 @@ const Marketplace = () => {
           {products.map((product, index) => (
             <div key={product._id} className="glass-card animate-fade-in" style={{ padding: '15px', display: 'flex', flexDirection: 'column', animationDelay: `${index * 0.08}s` }}>
               {/* PRODUCT IMAGE */}
-              <div style={{ width: '100%', height: '200px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '15px', overflow: 'hidden', position: 'relative' }}>
+              <div style={{ width: '100%', height: '200px', background: '#f8fafc', borderRadius: '12px', marginBottom: '15px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <button
                   onClick={(e) => {
                     e.preventDefault();
@@ -253,7 +253,7 @@ const Marketplace = () => {
                 >
                   <Heart size={18} fill={wishlistIds.has(product._id) ? '#ef4444' : 'none'} />
                 </button>
-                <img src={product.images[0] || fallbackImage} alt={product.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = fallbackImage; }} />
+                <img src={product.images[0] || fallbackImage} alt={product.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '15px', mixBlendMode: 'multiply' }} onError={(e) => { e.target.onerror = null; e.target.src = fallbackImage; }} />
               </div>
 
               {/* PRODUCT DETAILS */}

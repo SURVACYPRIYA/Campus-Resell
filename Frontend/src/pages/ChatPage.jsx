@@ -37,7 +37,7 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
-
+  const [chatToDelete, setChatToDelete] = useState(null);
   const messagesEndRef = useRef(null);
   const hasAutoOpened = useRef(false);
 
@@ -210,50 +210,22 @@ const ChatPage = () => {
   };
 
   const handleDeleteChat = (chatId) => {
-    toast.custom((t) => (
-      <div style={{
-        background: '#ffffff', padding: '20px 24px', borderRadius: '16px',
-        boxShadow: '0 10px 40px rgba(35, 53, 89, 0.2)', display: 'flex', flexDirection: 'column', gap: '16px',
-        border: '1px solid var(--glass-border)', opacity: t.visible ? 1 : 0,
-        transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-10px)',
-        transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)', width: '320px', pointerEvents: 'auto'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
-            <Trash2 size={20} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontWeight: '700', color: '#233559', fontSize: '1.05rem' }}>Delete Chat</span>
-            <span style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '2px' }}>This conversation cannot be recovered.</span>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            style={{ flex: 1, padding: '10px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#e2e8f0'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#f1f5f9'}
-          >Cancel</button>
-          <button
-            onClick={async () => {
-              toast.dismiss(t.id);
-              try {
-                await axios.delete(`/api/chats/${chatId}`);
-                setChats(prev => prev.filter(c => c._id !== chatId));
-                if (activeChat?._id === chatId) setActiveChat(null);
-                toast.success('Conversation deleted');
-              } catch (err) {
-                console.error(err);
-                toast.error('Failed to delete chat');
-              }
-            }}
-            style={{ flex: 1, padding: '10px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s', fontSize: '0.9rem' }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#dc2626'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#ef4444'}
-          >Yes, Delete</button>
-        </div>
-      </div>
-    ), { duration: Infinity, position: 'top-center', id: 'delete-chat-toast' });
+    setChatToDelete(chatId);
+  };
+
+  const confirmDeleteChat = async () => {
+    if (!chatToDelete) return;
+    try {
+      await axios.delete(`/api/chats/${chatToDelete}`);
+      setChats(prev => prev.filter(c => c._id !== chatToDelete));
+      if (activeChat?._id === chatToDelete) setActiveChat(null);
+      toast.success('Conversation deleted');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete chat');
+    } finally {
+      setChatToDelete(null);
+    }
   };
 
   const handleSendMessage = async (e) => {
@@ -700,6 +672,61 @@ const ChatPage = () => {
       )}
 
       </div>
+      
+      {/* DELETE CHAT CONFIRMATION MODAL */}
+      {chatToDelete && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            padding: '30px',
+            width: '90%',
+            maxWidth: '400px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            transform: 'scale(1)',
+            animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Trash2 size={24} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Delete Chat</h3>
+                <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>This conversation cannot be recovered.</p>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '30px' }}>
+              <button 
+                onClick={() => setChatToDelete(null)}
+                style={{ padding: '10px 20px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '12px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#e2e8f0'}
+                onMouseLeave={e => e.currentTarget.style.background = '#f1f5f9'}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDeleteChat}
+                style={{ padding: '10px 20px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '12px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#dc2626'}
+                onMouseLeave={e => e.currentTarget.style.background = '#ef4444'}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
