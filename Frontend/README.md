@@ -1,16 +1,92 @@
-# React + Vite
+# AU Campus Trade — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The React + Vite frontend for **AU Campus Trade**, a university-exclusive student marketplace. Features a premium dark-mode UI with real-time chat, Cloudinary image hosting, and smooth animations.
 
-Currently, two official plugins are available:
+## 🌐 Deployment
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| | Link |
+|---|---|
+| 🖥️ Live on Vercel | [your-vercel-link-here](#) |
 
-## React Compiler
+> Replace `#` with your actual Vercel deployment URL.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Package | Purpose |
+|---|---|
+| `react` + `react-dom` | UI framework |
+| `vite` | Build tool & dev server |
+| `react-router-dom` | Client-side routing |
+| `axios` | HTTP requests to backend |
+| `socket.io-client` | Real-time chat (WebSocket) |
+| `framer-motion` | Animations & transitions |
+| `lucide-react` | Icon library |
+| `react-hot-toast` | Toast notifications |
+| `@react-oauth/google` | Google OAuth login |
+
+---
+
+## 🚀 Local Setup
+
+### Prerequisites
+- Node.js `v18+`
+- Backend server running (see `../Backend/README.md`)
+
+### Steps
+
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Create a `.env` file** in this directory:
+   ```env
+   VITE_BACKEND_URL=http://localhost:4000
+   ```
+
+3. **Start the dev server**
+   ```bash
+   npm run dev
+   ```
+   The app will be available at `http://localhost:5173`.
+
+---
+
+## 📜 Available Scripts
+
+| Script | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production (`/dist`) |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint checks |
+
+---
+
+## 📁 Project Structure
+
+```
+Frontend/
+├── public/            # Static assets
+├── src/
+│   ├── components/    # Reusable UI components
+│   ├── pages/         # Page-level components
+│   ├── context/       # React context (auth, socket, etc.)
+│   ├── assets/        # Images and static files
+│   └── main.jsx       # App entry point
+├── index.html
+└── vite.config.js
+```
+
+---
+
+## ☁️ Deploying to Vercel
+
+1. Push your code to GitHub.
+2. Go to [vercel.com](https://vercel.com) → **New Project** → Import your repo.
+3. Set **Root Directory** to `Frontend`.
+4. Add environment variables:
+   - `VITE_BACKEND_URL` → your Render backend URL
+5. Click **Deploy**.
