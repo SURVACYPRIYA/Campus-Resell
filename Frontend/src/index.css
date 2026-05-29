@@ -156,6 +156,24 @@ select.input-glass {
   width: 100%;
 }
 
+/* Brand Logo Animations */
+.brand-logo-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  text-decoration: none;
+  cursor: default;
+}
+
+.brand-logo-container svg {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.brand-logo-container:hover svg {
+  transform: scale(1.12) rotate(6deg);
+  filter: drop-shadow(0 4px 12px rgba(193, 38, 50, 0.4));
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }

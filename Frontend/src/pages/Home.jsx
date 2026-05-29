@@ -105,7 +105,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
               style={{ fontSize: '4rem', fontWeight: '800', marginBottom: '20px', color: '#ffffff', lineHeight: '1.15', maxWidth: '950px', letterSpacing: '-0.02em' }}
             >
-              Smart student reselling <br /> takes more than grades.
+              Smart student trading <br /> starts here.
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}

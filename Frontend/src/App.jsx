@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
+import Preloader from './components/Preloader';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -41,12 +42,15 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+  const [appReady, setAppReady] = useState(false);
+
   return (
     <ThemeProvider>
       <AuthProvider>
         <NotificationProvider>
+          {!appReady && <Preloader onComplete={() => setAppReady(true)} />}
           <Router>
-            <div className="app-container">
+            <div className="app-container" style={{ opacity: appReady ? 1 : 0, transition: 'opacity 0.5s ease-in' }}>
               <Toaster
                 position="top-center"
                 toastOptions={{

@@ -96,22 +96,40 @@ const Navbar = () => {
 
         {/* Content Layer */}
         {/* Left: Official Logo */}
-        <div style={{ position: 'relative', zIndex: 1, height: '40px', display: 'flex', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', height: '100%', textDecoration: 'none', cursor: 'default' }}>
-            <img 
-              src="https://cdn.sanity.io/images/v1rb7aqk/production/358a0b743e7fbbd8be475f4dca39d275afe10fa5-352x76.png?q=70&auto=format&w=640"
-              alt="Anurag University Logo"
-              style={{ height: '32px', objectFit: 'contain' }}
-            />
-            <span style={{ 
-              marginLeft: '12px', 
-              fontSize: '1.2rem', 
-              fontWeight: '800', 
-              color: '#233559',
-              letterSpacing: '0.02em'
-            }}>
-              Resell<span style={{ color: 'var(--primary)' }}>Portal</span>
-            </span>
+        <div style={{ position: 'relative', zIndex: 1, height: '48px', display: 'flex', alignItems: 'center', marginLeft: '-10px' }}>
+          <div className="brand-logo-container">
+            <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 50 15 L 85 35 L 85 75 L 50 95 L 15 75 L 15 35 Z" stroke="#C12632" strokeWidth="6" strokeLinejoin="round"/>
+              <path d="M 15 35 L 50 55 L 85 35 M 50 55 V 95" stroke="#C12632" strokeWidth="6" strokeLinejoin="round"/>
+              <path d="M 35 45 L 50 30 L 65 45 M 50 30 V 50" stroke="#233559" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '10px', justifyContent: 'center' }}>
+              <span style={{ 
+                fontSize: '1.2rem', 
+                fontWeight: '900', 
+                color: '#233559',
+                letterSpacing: '0.02em',
+                lineHeight: '1.1'
+              }}>
+                AU CAMPUS TRADE
+              </span>
+              <div style={{
+                width: '100%',
+                height: '1px',
+                background: 'var(--primary)',
+                margin: '1px 0',
+                borderRadius: '1px'
+              }}></div>
+              <span style={{
+                fontSize: '0.65rem',
+                fontWeight: '700',
+                color: '#233559', // Changed to dark blue so the red line stands out more
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+              }}>
+                Student Marketplace
+              </span>
+            </div>
           </div>
         </div>
 
