@@ -9,7 +9,6 @@ A secure, premium, and exclusive internal marketplace built specifically for uni
 | 🖥️ Frontend (Vercel) | [your-vercel-link-here](#) |
 | ⚙️ Backend (Render) | [your-render-link-here](#) |
 
-> **Note:** Replace the `#` placeholders above with your actual Vercel and Render deployment URLs after deploying.
 
 ## ✨ Key Features
 - **University-Exclusive Access:** Secure registration restricted to `@anurag.edu.in` university email domains to ensure a trusted community.
