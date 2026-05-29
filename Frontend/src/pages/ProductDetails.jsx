@@ -19,6 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import CameraModal from '../components/CameraModal';
 import toast from 'react-hot-toast';
 
+
 const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3e%3crect width='800' height='600' fill='%23f1f5f9'/%3e%3cg transform='translate(360, 260)'%3e%3csvg width='80' height='80' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3e%3crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3e%3ccircle cx='8.5' cy='8.5' r='1.5'/%3e%3cpolyline points='21 15 16 10 5 21'/%3e%3c/svg%3e%3c/g%3e%3c/svg%3e";
 
 const ProductDetails = () => {
@@ -27,6 +28,7 @@ const ProductDetails = () => {
   const navigate = useNavigate();
 
   const { user } = useAuth();
+  const [isUploading, setIsUploading] = React.useState(false);
 
   const [product, setProduct] = useState(null);
 
