@@ -76,7 +76,48 @@ const ProductDetails = () => {
         );
         setProduct(res.data.data.product);
         setShowCamera(false);
-        toast.success('Photo updated successfully!');
+        toast.custom((t) => (
+  <div
+    style={{
+      background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+      padding: '14px 22px',
+      borderRadius: '16px',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '14px',
+      border: `1px solid rgba(239, 68, 68, 0.2)`,
+      opacity: t.visible ? 1 : 0,
+      transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+      transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+      cursor: 'pointer'
+    }}
+    onClick={() => toast.dismiss(t.id)}
+  >
+    <div style={{
+      width: '38px',
+      height: '38px',
+      borderRadius: '50%',
+      background: 'linear-gradient(135deg, #10b981, #065f46)',
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+      boxShadow: '0 4px 10px rgba(16, 185, 129, 0.3)'
+    }}>
+      <CheckCircle2 size={20} color="white" />
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
+      <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+        Photo Updated
+      </span>
+      <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+        Your photo has been saved.
+      </span>
+    </div>
+  </div>
+), { duration: 3000 });
       } catch (err) {
         console.error('Error updating photo:', err);
         toast.error('Failed to update photo');
@@ -108,7 +149,48 @@ const ProductDetails = () => {
       } else if (currentImageIdx > photoToDeleteIndex) {
         setCurrentImageIdx(currentImageIdx - 1);
       }
-      toast.success("Photo deleted successfully");
+      toast.custom((t) => (
+  <div
+    style={{
+      background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+      padding: '14px 22px',
+      borderRadius: '16px',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '14px',
+      border: `1px solid rgba(239, 68, 68, 0.2)`,
+      opacity: t.visible ? 1 : 0,
+      transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+      transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+      cursor: 'pointer'
+    }}
+    onClick={() => toast.dismiss(t.id)}
+  >
+    <div style={{
+      width: '38px',
+      height: '38px',
+      borderRadius: '50%',
+      background: 'linear-gradient(135deg, #10b981, #065f46)',
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+      boxShadow: '0 4px 10px rgba(16, 185, 129, 0.3)'
+    }}>
+      <CheckCircle2 size={20} color="white" />
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
+      <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+        Photo Deleted
+      </span>
+      <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+        Your photo has been removed.
+      </span>
+    </div>
+  </div>
+), { duration: 3000 });
     } catch (err) {
       console.error('Error deleting photo:', err);
       toast.error('Failed to delete photo');

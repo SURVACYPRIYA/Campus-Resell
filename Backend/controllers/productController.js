@@ -1,9 +1,13 @@
 const Product = require('../models/Product');
+const { uploadImage } = require('../utils/cloudinary');
 
 exports.createProduct = async (req, res) => {
     try {
-        const { title, description, price, category, images } = req.body;
-        
+        let { title, description, price, category, images } = req.body;
+        // Upload any base64 images to Cloudinary (fallback to original data if not configured)
+        if (Array.isArray(images) && images.length > 0) {
+            images = await Promise.all(images.map(img => uploadImage(img)));
+        }
         const product = await Product.create({
             title,
             description,
@@ -93,6 +97,12 @@ exports.updateProduct = async (req, res) => {
         }
 
         const updateData = { ...req.body };
+        // Handle image uploads if images array is provided
+        if (Array.isArray(updateData.images) && updateData.images.length > 0) {
+            updateData.images = await Promise.all(
+                updateData.images.map(img => (typeof img === 'string' && img.startsWith('data:') ? uploadImage(img) : img))
+            );
+        }
         if (updateData.status === 'available') {
             updateData.$unset = { buyer: 1 };
             delete updateData.buyer;
