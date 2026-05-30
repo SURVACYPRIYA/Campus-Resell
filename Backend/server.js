@@ -28,29 +28,24 @@ const app = express();
 const server = http.createServer(app);
 
 // SOCKET.IO
-const io = new Server(server, {
-    cors: {
-        origin: process.env.FRONTEND_URL || [
-            'http://localhost:5173',
-            'http://localhost:5174'
-        ],
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
+  : [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'https://campus-resell-rho.vercel.app/'
+    ];
 
-        methods: ['GET', 'POST'],
-        credentials: true
-    }
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
 });
 
-// MIDDLEWARE
-app.use(express.json({ limit: '20mb' }));
-app.use(express.urlencoded({ limit: '20mb', extended: true }));
-app.use(cookieParser());
-
 app.use(cors({
-    origin: process.env.FRONTEND_URL || [
-        'http://localhost:5173',
-        'http://localhost:5174'
-    ],
-
+    origin: allowedOrigins,
     credentials: true
 }));
 
