@@ -45,6 +45,7 @@ const io = new Server(server, {
 });
 
 // MIDDLEWARE
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(cookieParser());
@@ -67,7 +68,12 @@ app.use('/api/users', userRoutes);
 
 // TEST ROUTE
 app.get('/', (req, res) => {
-    res.send('Campus Resell API is running...');
+  res.send('Campus Resell API is running...');
+});
+
+// Health check for Render monitoring
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: Date.now() });
 });
 
 // SOCKET CONNECTION
