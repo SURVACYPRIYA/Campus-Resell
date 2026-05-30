@@ -138,9 +138,9 @@ const Navbar = () => {
           gap: '20px', 
           alignItems: 'center' 
         }}>
+          <Link to="/" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}><span className="nav-link-text">Home</span></Link>
           {user && (
             <>
-          <Link to="/" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}><span className="nav-link-text">Home</span></Link>
           <Link to="/marketplace" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}><span className="nav-link-text">Marketplace</span></Link>
           <Link to="/sell" className="nav-link" style={{ color: '#233559', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>
             <PlusCircle size={18} style={{ color: 'var(--primary)' }} /> <span className="nav-link-text">Sell</span>
