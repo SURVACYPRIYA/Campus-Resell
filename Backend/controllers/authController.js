@@ -16,7 +16,7 @@ const getCookieOptions = () => {
     return {
         httpOnly: true,
         secure: true,
-        sameSite: None,
+        sameSite: 'none',
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     };
 };
