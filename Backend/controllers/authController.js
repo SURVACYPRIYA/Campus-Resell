@@ -225,7 +225,7 @@ exports.forgotPassword = async (req, res) => {
         const resetToken = user.createPasswordResetToken();
         await user.save({ validateBeforeSave: false });
 
-        const resetURL = `http://localhost:5174/reset-password/${resetToken}`;
+        const resetURL = `${(process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '')}/reset-password/${resetToken}`;
 
         const htmlContent = `
             <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 40px 20px;">

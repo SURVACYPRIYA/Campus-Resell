@@ -29,11 +29,11 @@ const server = http.createServer(app);
 
 // SOCKET.IO
 const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
+  ? process.env.FRONTEND_URL.split(',').map(o => o.trim().replace(/\/$/, ''))
   : [
       'http://localhost:5173',
       'http://localhost:5174',
-      'https://campus-resell-rho.vercel.app/'
+      'https://campus-resell-rho.vercel.app'
     ];
 
 const io = new Server(server, {
