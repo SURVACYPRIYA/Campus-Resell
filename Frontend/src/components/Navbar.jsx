@@ -131,7 +131,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Right: Navigation Links */}
         <div className="navbar-links" style={{ 
           position: 'relative', 
           zIndex: 1, 
@@ -139,6 +138,8 @@ const Navbar = () => {
           gap: '20px', 
           alignItems: 'center' 
         }}>
+          {user && (
+            <>
           <Link to="/" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}><span className="nav-link-text">Home</span></Link>
           <Link to="/marketplace" className="nav-link" style={{ color: '#233559', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}><span className="nav-link-text">Marketplace</span></Link>
           <Link to="/sell" className="nav-link" style={{ color: '#233559', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem' }}>
@@ -172,6 +173,8 @@ const Navbar = () => {
             </div>
             <span>Chat</span>
           </Link>
+          </>
+          )}
           {/* Support Dropdown */}
           <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
             <button
@@ -361,8 +364,8 @@ const Navbar = () => {
                     </button>
                   </div>
                 )}
-              </div>
-            </>
+              </div></>
+            
           ) : (
             <>
             <Link to="/login" style={{
@@ -407,6 +410,7 @@ const Navbar = () => {
               REGISTER
             </Link>
             </>
+            
           )}
         </div>
       </div>
