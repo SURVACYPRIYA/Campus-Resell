@@ -15,8 +15,8 @@ const getCookieOptions = () => {
     const isProd = process.env.NODE_ENV === 'production' || (process.env.FRONTEND_URL && process.env.FRONTEND_URL.includes('vercel.app'));
     return {
         httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? 'none' : 'strict',
+        secure: true,
+        sameSite: None,
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     };
 };
@@ -64,6 +64,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
+
         const { email, password } = req.body;
 
         // 1) Check if email and password exist
@@ -134,11 +135,11 @@ exports.googleLogin = async (req, res) => {
             const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to fetch user info from Google');
             }
-            
+
             const data = await response.json();
             email = data.email;
             name = data.name;
@@ -165,7 +166,7 @@ exports.googleLogin = async (req, res) => {
         if (!user) {
             // Generate a random secure password for Google-authenticated users
             const randomPassword = crypto.randomBytes(16).toString('hex');
-            
+
             user = await User.create({
                 name,
                 email,
@@ -204,7 +205,7 @@ exports.logout = (req, res) => {
     const opts = getCookieOptions();
     opts.maxAge = undefined;
     opts.expires = new Date(Date.now() + 10 * 1000);
-    
+
     res.cookie('token', 'loggedout', opts);
     res.status(200).json({ status: 'success', message: 'Logged out successfully' });
 };
@@ -267,7 +268,7 @@ exports.forgotPassword = async (req, res) => {
                 user.resetPasswordExpires = undefined;
                 await user.save({ validateBeforeSave: false });
             }
-        } catch (_) {}
+        } catch (_) { }
         res.status(500).json({ message: 'Failed to send reset email. Please check email configuration.' });
     }
 };
@@ -293,10 +294,10 @@ exports.resetPassword = async (req, res) => {
         await user.save();
 
         // 3) Update changedPasswordAt property for the user (optional, if you track it)
-        
+
         // 4) Log the user in, send JWT
         const token = signToken(user._id);
-        
+
         res.cookie('token', token, getCookieOptions());
 
         res.status(200).json({
