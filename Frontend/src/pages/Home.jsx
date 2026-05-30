@@ -172,48 +172,6 @@ const Home = () => {
             </div>
           </section>
 
-          {/* ===== STUDENT REVIEWS SECTION ===== */}
-          <section style={{ marginTop: '80px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <span style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Community Voice</span>
-              <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '10px', marginBottom: '8px', color: '#233559' }}>What Students Say</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>Real reviews from verified Anurag University students</p>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
-                <StarRating rating={5} size={16} />
-                <span style={{ fontWeight: '700', color: '#233559', fontSize: '1rem' }}>4.7</span>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>avg · {REVIEWS.length} reviews</span>
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
-              {REVIEWS.map((r, i) => (
-                <div
-                  key={r.id}
-                  className="glass-card rcard"
-                  style={{ padding: '24px', animationDelay: `${i * 0.06}s`, borderTop: '3px solid var(--secondary)', cursor: 'default' }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 28px rgba(193,38,50,0.1)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = ''; }}
-                >
-                  <div style={{ marginBottom: '10px' }}>
-                    <StarRating rating={r.rating} size={14} />
-                  </div>
-                  <p style={{ fontSize: '0.92rem', color: 'var(--text-main)', fontStyle: 'italic', lineHeight: 1.6, marginBottom: '16px' }}>
-                    &ldquo;{r.text}&rdquo;
-                  </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '12px', borderTop: '1px solid var(--glass-border)' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8b1a25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: '800', color: 'white', flexShrink: 0 }}>
-                      {r.author.charAt(0)}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.82rem', fontWeight: '700', color: 'var(--text-main)' }}>{r.author}</div>
-                      <div style={{ fontSize: '0.74rem', color: 'var(--primary)', fontWeight: '600' }}>{r.dept} · AU</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
           {/* MEETUP SAFETY COVENANTS - REDESIGNED (THEME MATCHED) */}
           <section className="glass-card" style={{
             marginTop: '80px',
