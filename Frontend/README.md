@@ -6,7 +6,7 @@ The React + Vite frontend for **AU Campus Trade**, a university-exclusive studen
 
 | | Link |
 |---|---|
-| 🖥️ Live on Vercel | [your-vercel-link-here](#) |
+| 🖥️ Live on Vercel | (https://campus-resell-rho.vercel.app) |
 
 > Replace `#` with your actual Vercel deployment URL.
 

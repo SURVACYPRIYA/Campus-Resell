@@ -6,7 +6,7 @@ The Node.js + Express REST API and WebSocket server for **AU Campus Trade**. Han
 
 | | Link |
 |---|---|
-| ⚙️ Live on Render | [your-render-link-here](#) |
+| ⚙️ Live on Render | (https://campus-resell-cix4.onrender.com) |
 
 > Replace `#` with your actual Render deployment URL.
 
