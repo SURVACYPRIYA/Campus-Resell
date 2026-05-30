@@ -11,6 +11,16 @@ const signToken = (id) => {
     });
 };
 
+const getCookieOptions = () => {
+    const isProd = process.env.NODE_ENV === 'production' || (process.env.FRONTEND_URL && process.env.FRONTEND_URL.includes('vercel.app'));
+    return {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? 'none' : 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    };
+};
+
 exports.register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -34,12 +44,7 @@ exports.register = async (req, res) => {
 
         const token = signToken(user._id);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-        });
+        res.cookie('token', token, getCookieOptions());
 
         res.status(201).json({
             status: 'success',
@@ -85,12 +90,7 @@ exports.login = async (req, res) => {
         // 4) If everything ok, send token to client
         const token = signToken(user._id);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-        });
+        res.cookie('token', token, getCookieOptions());
 
         res.status(200).json({
             status: 'success',
@@ -180,12 +180,7 @@ exports.googleLogin = async (req, res) => {
 
         const jwtToken = signToken(user._id);
 
-        res.cookie('token', jwtToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-        });
+        res.cookie('token', jwtToken, getCookieOptions());
 
         res.status(200).json({
             status: 'success',
@@ -206,12 +201,11 @@ exports.googleLogin = async (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    res.cookie('token', 'loggedout', {
-        httpOnly: true,
-        expires: new Date(Date.now() + 10 * 1000), // expires in 10 seconds
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
-    });
+    const opts = getCookieOptions();
+    opts.maxAge = undefined;
+    opts.expires = new Date(Date.now() + 10 * 1000);
+    
+    res.cookie('token', 'loggedout', opts);
     res.status(200).json({ status: 'success', message: 'Logged out successfully' });
 };
 
@@ -303,12 +297,7 @@ exports.resetPassword = async (req, res) => {
         // 4) Log the user in, send JWT
         const token = signToken(user._id);
         
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-        });
+        res.cookie('token', token, getCookieOptions());
 
         res.status(200).json({
             status: 'success',
