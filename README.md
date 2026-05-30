@@ -6,8 +6,8 @@ A secure, premium, and exclusive internal marketplace built specifically for uni
 
 | Service | Link |
 |---------|------|
-| 🖥️ Frontend (Vercel) | [your-vercel-link-here](#) |
-| ⚙️ Backend (Render) | [your-render-link-here](#) |
+| 🖥️ Frontend (Vercel) | [https://campus-resell-rho.vercel.app] |
+| ⚙️ Backend (Render) | [https://campus-resell-cix4.onrender.com] |
 
 
 ## ✨ Key Features
