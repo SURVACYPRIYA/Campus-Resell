@@ -215,11 +215,11 @@ const Home = () => {
           </section>
 
           {/* MEETUP SAFETY COVENANTS - REDESIGNED (THEME MATCHED) */}
-          <section className="glass-card" style={{ 
-            marginTop: '80px', 
-            padding: '50px 40px', 
-            background: '#f8fafc', 
-            borderLeft: '6px solid var(--primary)', 
+          <section className="glass-card" style={{
+            marginTop: '80px',
+            padding: '50px 40px',
+            background: '#f8fafc',
+            borderLeft: '6px solid var(--primary)',
             borderRadius: '16px',
             boxShadow: '0 10px 30px rgba(0,0,0,0.03)'
           }}>
