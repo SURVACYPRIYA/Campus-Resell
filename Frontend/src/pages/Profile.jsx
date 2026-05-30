@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react';
 import axios from '../axios';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, Package, Mail, User, ShieldCheck, Trash2, MoreVertical } from 'lucide-react';
+import { Loader2, Package, Mail, User, ShieldCheck, Trash2, MoreVertical, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 
@@ -48,22 +48,53 @@ const Profile = () => {
     }
   }, [user]);
 
-  const handleDeleteProduct = async (productId) => {
-    if (!window.confirm('Are you sure you want to delete this listing? This will also remove all related chats and cannot be undone.')) {
-      return;
-    }
-    try {
-      await axios.delete(`/api/products/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${null}`
-        }
-      });
-      setProducts((prev) => prev.filter((p) => p._id !== productId));
-      toast.error('Listing deleted successfully!');
-    } catch (err) {
-      console.error('Error deleting product:', err);
-      toast.error(err.response?.data?.message || 'Failed to delete listing');
-    }
+  const handleDeleteProduct = (productId) => {
+    toast.custom((t) => (
+      <div style={{
+        background: 'linear-gradient(135deg, #1e293b, #0f172a)', padding: '20px 24px',
+        borderRadius: '16px', boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
+        display: 'flex', flexDirection: 'column', gap: '16px',
+        border: '1px solid rgba(255,255,255,0.1)',
+        opacity: t.visible ? 1 : 0,
+        transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{
+            width: '42px', height: '42px', borderRadius: '50%',
+            background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(239,68,68,0.3)'
+          }}>
+            <Trash2 size={20} color="white" />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '1rem' }}>Delete Listing</span>
+            <span style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '4px' }}>This cannot be undone. Are you sure?</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={() => toast.dismiss(t.id)} style={{
+            flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)',
+            background: 'transparent', color: '#f8fafc', fontWeight: '600', cursor: 'pointer'
+          }}>Cancel</button>
+          <button onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await axios.delete(`/api/products/${productId}`);
+              setProducts((prev) => prev.filter((p) => p._id !== productId));
+              toast.success('Listing deleted!');
+            } catch (err) {
+              toast.error(err.response?.data?.message || 'Failed to delete listing');
+            }
+          }} style={{
+            flex: 1, padding: '10px', borderRadius: '10px', border: 'none',
+            background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white',
+            fontWeight: '600', cursor: 'pointer'
+          }}>Delete</button>
+        </div>
+      </div>
+    ), { duration: Infinity, position: 'top-center' });
   };
 
   if (loading) {
@@ -109,7 +140,46 @@ const Profile = () => {
                   <button onClick={() => { setShowMenu(false); navigate('/my-listings'); }} style={menuItemStyle}>📦 My Listings</button>
                   <button onClick={() => { setShowMenu(false); navigate('/purchases'); }} style={menuItemStyle}>🛍️ Purchases</button>
                   <hr style={{ margin: '4px 0', border: 'none', borderTop: '1px solid #e2e8f0' }} />
-                  <button onClick={() => { setShowMenu(false); if (window.confirm('Are you sure you want to logout?')) logout(); }} style={{ ...menuItemStyle, color: '#ef4444' }}>🚪 Logout</button>
+                  <button onClick={() => {
+                    setShowMenu(false);
+                    toast.custom((t) => (
+                      <div style={{
+                        background: 'linear-gradient(135deg, #1e293b, #0f172a)', padding: '20px 24px',
+                        borderRadius: '16px', boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
+                        display: 'flex', flexDirection: 'column', gap: '16px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        opacity: t.visible ? 1 : 0,
+                        transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+                        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                          <div style={{
+                            width: '42px', height: '42px', borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                            boxShadow: '0 4px 10px rgba(239,68,68,0.3)'
+                          }}>
+                            <LogOut size={20} color="white" />
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '1rem' }}>Confirm Logout</span>
+                            <span style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '4px' }}>Are you sure you want to log out?</span>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          <button onClick={() => toast.dismiss(t.id)} style={{
+                            flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)',
+                            background: 'transparent', color: '#f8fafc', fontWeight: '600', cursor: 'pointer'
+                          }}>Cancel</button>
+                          <button onClick={() => { toast.dismiss(t.id); logout(); navigate('/login'); }} style={{
+                            flex: 1, padding: '10px', borderRadius: '10px', border: 'none',
+                            background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white',
+                            fontWeight: '600', cursor: 'pointer'
+                          }}>Logout</button>
+                        </div>
+                      </div>
+                    ), { duration: Infinity, position: 'top-center' });
+                  }} style={{ ...menuItemStyle, color: '#ef4444' }}>🚪 Logout</button>
                 </div>
               )}
             </h1>

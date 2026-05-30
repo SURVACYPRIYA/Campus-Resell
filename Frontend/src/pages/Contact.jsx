@@ -85,7 +85,51 @@ const Contact = () => {
           style={{ padding: '40px' }}
         >
           <h2 style={{ fontSize: '1.8rem', marginBottom: '20px', color: '#233559' }}>Send a Message</h2>
-          <form onSubmit={(e) => { e.preventDefault(); toast.success('Message sent successfully! We will get back to you soon.'); }}>
+          <form onSubmit={(e) => { 
+            e.preventDefault(); 
+            toast.custom((t) => (
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #064e3b, #065f46)',
+                  padding: '14px 22px',
+                  borderRadius: '16px',
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '14px',
+                  border: '1px solid rgba(16, 185, 129, 0.2)',
+                  opacity: t.visible ? 1 : 0,
+                  transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+                  transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                  cursor: 'pointer'
+                }}
+                onClick={() => toast.dismiss(t.id)}
+              >
+                <div style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: '0 4px 10px rgba(16, 185, 129, 0.3)'
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
+                  <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+                    Message Sent
+                  </span>
+                  <span style={{ color: '#a7f3d0', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+                    We will get back to you soon.
+                  </span>
+                </div>
+              </div>
+            ), { duration: 4000 });
+          }}>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontWeight: '600' }}>Your Name</label>
               <input type="text" className="input-glass" placeholder="John Doe" required />

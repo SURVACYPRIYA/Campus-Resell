@@ -173,7 +173,48 @@ const CreateProduct = () => {
     setLoading(true);
 
     if (imageFiles.length === 0 && !formData.imageUrl) {
-      toast('Please provide at least one product image (photo or link).');
+      toast.custom((t) => (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+            padding: '14px 22px',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            opacity: t.visible ? 1 : 0,
+            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            cursor: 'pointer'
+          }}
+          onClick={() => toast.dismiss(t.id)}
+        >
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(239, 68, 68, 0.3)'
+          }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+              Missing Image
+            </span>
+            <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+              Please provide at least one photo or link.
+            </span>
+          </div>
+        </div>
+      ), { duration: 4000 });
       setLoading(false);
       return;
     }
@@ -262,7 +303,48 @@ const CreateProduct = () => {
       navigate('/marketplace');
     } catch (err) {
       console.error(err);
-      toast.error('Failed to create listing');
+      toast.custom((t) => (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+            padding: '14px 22px',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            opacity: t.visible ? 1 : 0,
+            transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            cursor: 'pointer'
+          }}
+          onClick={() => toast.dismiss(t.id)}
+        >
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(239, 68, 68, 0.3)'
+          }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '0.95rem', lineHeight: '1.2' }}>
+              Listing Failed
+            </span>
+            <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: '500', marginTop: '2px' }}>
+              Failed to create listing.
+            </span>
+          </div>
+        </div>
+      ), { duration: 4000 });
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import axios from '../axios';
 import {
@@ -42,7 +43,75 @@ const Dashboard = () => {
     fetchData();
   }, [user]);
 
-  const handleLogout = () => { if (window.confirm('Are you sure you want to logout?')) { logout(); navigate('/login'); } };
+  const handleLogout = () => {
+    toast.custom((t) => (
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+          padding: '20px 24px',
+          borderRadius: '16px',
+          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.4)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          opacity: t.visible ? 1 : 0,
+          transform: t.visible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-20px)',
+          transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{
+            width: '42px', height: '42px', borderRadius: '50%',
+            background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(239, 68, 68, 0.3)'
+          }}>
+            <LogOut size={20} color="white" />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '180px' }}>
+            <span style={{ fontWeight: '700', color: '#f8fafc', fontSize: '1rem', lineHeight: '1.2' }}>
+              Confirm Logout
+            </span>
+            <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: '500', marginTop: '4px' }}>
+              Are you sure you want to log out?
+            </span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)',
+              background: 'transparent', color: '#f8fafc', fontWeight: '600', cursor: 'pointer',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              logout();
+              navigate('/login');
+            }}
+            style={{
+              flex: 1, padding: '10px', borderRadius: '10px', border: 'none',
+              background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white',
+              fontWeight: '600', cursor: 'pointer', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(239, 68, 68, 0.4)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)'; }}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    ), { duration: Infinity, position: 'top-center' });
+  };
 
   const statCards = [
     { icon: <Package size={28} />, label: 'Total Listings', value: stats.listings, color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', to: '/my-listings' },
