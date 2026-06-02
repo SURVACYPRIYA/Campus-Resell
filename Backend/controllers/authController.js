@@ -6,6 +6,8 @@ const crypto = require('crypto');
 const sendEmail = require('../utils/sendEmail');
 
 const signToken = (id) => {
+    console.log('Generating JWT for user ID:', id);
+    console.log('JWT_SECRET length (sign):', process.env.JWT_SECRET?.length);
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: '30d'
     });
