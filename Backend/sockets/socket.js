@@ -6,8 +6,12 @@ const setupSocket = (server) => {
 
   const io = new Server(server, {
     cors: {
-      origin: 'http://localhost:5174',
-      methods: ['GET', 'POST']
+      origin: [
+        'http://localhost:5174',
+        'https://campus-resell-rho.vercel.app'
+      ],
+      methods: ['GET', 'POST'],
+      credentials: true
     }
   });
 
@@ -81,4 +85,4 @@ const setupSocket = (server) => {
 
 };
 
-module.exports = setupSocket;
+module.exports = setupSocket;
