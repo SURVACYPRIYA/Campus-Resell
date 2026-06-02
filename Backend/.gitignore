@@ -1,0 +1,17 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.test
+.env.production
+.env.local
+
+# Test scripts
+createProductWithImage.js
