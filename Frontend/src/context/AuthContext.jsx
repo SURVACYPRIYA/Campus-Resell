@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const API_URL = '/api/auth';
+    const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
 
     useEffect(() => {
         // Just try fetching user; cookies will be sent automatically
