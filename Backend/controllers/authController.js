@@ -14,12 +14,17 @@ const signToken = (id) => {
 };
 
 const getCookieOptions = () => {
-    const isProd = process.env.NODE_ENV === 'production' || (process.env.FRONTEND_URL && process.env.FRONTEND_URL.includes('vercel.app'));
+    const isProd =
+      process.env.NODE_ENV === 'production' ||
+      (process.env.FRONTEND_URL &&
+       process.env.FRONTEND_URL.includes('vercel.app'));
+
     return {
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        secure: isProd,
+        sameSite: isProd ? 'None' : 'Lax',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60 * 1000
     };
 };
 
