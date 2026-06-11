@@ -17,51 +17,39 @@ const reportRoutes = require('./routes/reportRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
+
+// CONNECT DB
 connectDB();
 
 const app = express();
 const server = http.createServer(app);
 
-/* =========================
-   🌍 ALLOWED ORIGINS (FIXED)
-========================= */
-
+// =========================
+// 🌍 ALLOWED ORIGINS FIX
+// =========================
 const allowedOrigins = new Set(
   (
     process.env.FRONTEND_URL
       ? process.env.FRONTEND_URL.split(',')
       : [
           'http://localhost:5173',
+          'http://127.0.0.1:5173',
           'http://localhost:5174',
           'https://campus-resell-rho.vercel.app'
         ]
-  ).map(o => {
-    try {
-      return new URL(o).origin; // normalize properly
-    } catch {
-      return o.trim();
-    }
-  })
+  ).map(o => o.trim().replace(/\/$/, ''))
 );
 
-const isAllowedOrigin = (origin) => {
-  if (!origin) return true; // Postman / mobile apps
-
-  try {
-    const cleanOrigin = new URL(origin).origin;
-    return allowedOrigins.has(cleanOrigin);
-  } catch {
-    return false;
-  }
-};
-
-/* =========================
-   🔥 EXPRESS CORS
-========================= */
-
+// =========================
+// 🔥 EXPRESS CORS
+// =========================
 app.use(cors({
   origin: (origin, callback) => {
-    if (isAllowedOrigin(origin)) {
+    if (!origin) return callback(null, true); // Postman / mobile apps
+
+    const cleanOrigin = origin.replace(/\/$/, '');
+
+    if (allowedOrigins.has(cleanOrigin)) {
       return callback(null, true);
     }
 
@@ -71,14 +59,17 @@ app.use(cors({
   credentials: true
 }));
 
-/* =========================
-   🔥 SOCKET.IO CORS
-========================= */
-
+// =========================
+// 🔥 SOCKET.IO CORS
+// =========================
 const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
-      if (isAllowedOrigin(origin)) {
+      if (!origin) return callback(null, true);
+
+      const cleanOrigin = origin.replace(/\/$/, '');
+
+      if (allowedOrigins.has(cleanOrigin)) {
         return callback(null, true);
       }
 
@@ -89,44 +80,37 @@ const io = new Server(server, {
   }
 });
 
-/* =========================
-   🧠 MIDDLEWARE
-========================= */
-
+// =========================
+// 🧠 MIDDLEWARE
+// =========================
 app.set('trust proxy', 1);
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 app.use(cookieParser());
 
-/* =========================
-   📦 ROUTES
-========================= */
-
+// =========================
+// 📦 ROUTES
+// =========================
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/users', userRoutes);
 
-/* =========================
-   🧪 TEST ROUTES
-========================= */
-
+// =========================
+// 🧪 TEST ROUTES
+// =========================
 app.get('/', (req, res) => {
   res.send('Campus Resell API is running...');
 });
 
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    status: 'ok',
-    timestamp: Date.now()
-  });
+  res.status(200).json({ status: 'ok', timestamp: Date.now() });
 });
 
-/* =========================
-   🔌 SOCKET LOGIC
-========================= */
-
+// =========================
+// 🔌 SOCKET LOGIC
+// =========================
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
@@ -194,12 +178,13 @@ io.on('connection', (socket) => {
   });
 });
 
-/* =========================
-   🚀 START SERVER
-========================= */
-
+// =========================
+// 🚀 START SERVER
+// =========================
 const PORT = process.env.PORT || 5001;
 
 server.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(
+    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
+  );
 });
