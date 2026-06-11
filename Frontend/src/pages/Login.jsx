@@ -144,7 +144,7 @@ const Login = () => {
         zIndex: 1
       }}>
         {/* Card */}
-        <div style={{
+        <div className="auth-card" style={{
           background: 'rgba(255,255,255,0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',

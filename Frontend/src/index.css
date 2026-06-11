@@ -27,11 +27,22 @@ textarea {
   display: block;
 }
 
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Prevent nested containers from constraining layout on mobile */
+#root {
+  width: 100%;
+}
+
+
 body {
   background-color: var(--bg-dark);
   color: var(--text-main);
   min-height: 100vh;
-  overflow-x: hidden;
   background-image: 
     radial-gradient(at 0% 0%, rgba(193, 38, 50, 0.04) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(254, 204, 47, 0.04) 0px, transparent 50%);
@@ -208,3 +219,48 @@ select.input-glass {
     height: 32px !important;
   }
 }
+
+/* Auth responsive card */
+.auth-card {
+  padding: 48px 40px 40px;
+  width: 100%;
+  max-width: 440px;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 32px 20px 20px !important;
+  }
+}
+
+/* Hero section responsive typography */
+.hero-title {
+  font-size: 4rem;
+}
+.hero-subtitle {
+  font-size: 1.4rem;
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.2rem !important;
+  }
+  .hero-subtitle {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Mobile Navbar Toggle and Drawer CSS */
+.mobile-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar-links {
+    display: none !important;
+  }
+  .mobile-menu-toggle {
+    display: flex !important;
+  }
+}
+

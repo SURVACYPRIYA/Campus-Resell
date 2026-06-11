@@ -103,13 +103,15 @@ const Home = () => {
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <motion.h1
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-              style={{ fontSize: '4rem', fontWeight: '800', marginBottom: '20px', color: '#ffffff', lineHeight: '1.15', maxWidth: '950px', letterSpacing: '-0.02em' }}
+              className="hero-title"
+              style={{ fontWeight: '800', marginBottom: '20px', color: '#ffffff', lineHeight: '1.15', maxWidth: '950px', letterSpacing: '-0.02em' }}
             >
               Smart student trading <br /> starts here.
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
-              style={{ fontSize: '1.4rem', color: '#cbd5e1', marginBottom: '40px', maxWidth: '750px', lineHeight: '1.5', fontWeight: '500' }}
+              className="hero-subtitle"
+              style={{ color: '#cbd5e1', marginBottom: '40px', maxWidth: '750px', lineHeight: '1.5', fontWeight: '500' }}
             >
               And, we create the space for peer-to-peer exchange
             </motion.p>
@@ -134,7 +136,7 @@ const Home = () => {
         <div style={{ padding: '60px 20px 40px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
 
           {/* FEATURE CARDS */}
-          <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+          <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '30px' }}>
             {[
               { icon: <ShieldCheck size={32} />, title: "Secure & Verified", desc: "Only students with verified college emails can join the community." },
               { icon: <Zap size={32} />, title: "Instant Chat", desc: "Real-time 'Chat to Buy' feature connects you instantly with sellers." },
@@ -193,7 +195,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
               {[
                 { title: "Central Library Lobby", desc: "Monitored, safe indoor space with constant foot traffic. Ideal for book and small item exchanges.", icon: "📚", block: "Block-G" },
                 { title: "Block-D Cafeteria", desc: "Highly populated open social space. Great for daylight meetups and sitting down to test electronics.", icon: "☕", block: "Block-D" },

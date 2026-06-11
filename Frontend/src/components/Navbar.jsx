@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageSquare, PlusCircle, HelpCircle, BookOpen, Mail, ChevronDown, LifeBuoy, LogOut } from 'lucide-react';
+import { MessageSquare, PlusCircle, HelpCircle, BookOpen, Mail, ChevronDown, LifeBuoy, LogOut, Menu, X } from 'lucide-react';
 import { ThemeContext } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
@@ -14,6 +14,7 @@ const Navbar = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSupportMenu, setShowSupportMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const menuItemStyle = {
     width: '100%',
@@ -24,6 +25,29 @@ const Navbar = () => {
     cursor: 'pointer',
     color: 'var(--text-main)',
     fontSize: '0.92rem'
+  };
+
+  const mobileLinkStyle = {
+    color: '#233559',
+    textDecoration: 'none',
+    fontWeight: '700',
+    fontSize: '1.05rem',
+    padding: '10px 0',
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    borderBottom: '1px solid #f1f5f9'
+  };
+
+  const mobileSubLinkStyle = {
+    color: 'var(--text-main)',
+    textDecoration: 'none',
+    fontWeight: '500',
+    fontSize: '0.95rem',
+    padding: '8px 12px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
   };
 
   const displayName = user?.name
@@ -78,7 +102,8 @@ const Navbar = () => {
           inset: 0,
           display: 'flex',
           zIndex: 0,
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          overflow: 'hidden'
         }}>
           <div style={{
             width: '28%',
@@ -413,6 +438,26 @@ const Navbar = () => {
             
           )}
               </div>
+
+              {/* Mobile Hamburger Button */}
+              <button
+                onClick={() => setMobileMenuOpen(prev => !prev)}
+                className="mobile-menu-toggle"
+                style={{
+                  position: 'relative',
+                  zIndex: 10,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#233559',
+                  padding: '8px',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                title="Toggle Menu"
+              >
+                {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+              </button>
           </div>
       
       {/* LOGOUT CONFIRMATION MODAL */}
@@ -469,8 +514,86 @@ const Navbar = () => {
             </div>
           </div>
         )}
-      </div>
-      );
+
+      {/* Mobile Menu Drawer */}
+      {mobileMenuOpen && (
+        <div className="mobile-menu-drawer" style={{
+          position: 'absolute',
+          top: '75px',
+          left: 0,
+          width: '100%',
+          background: '#ffffff',
+          borderBottom: '2px solid var(--glass-border)',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+          zIndex: 999,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '20px',
+          gap: '16px',
+          maxHeight: 'calc(100vh - 75px)',
+          overflowY: 'auto'
+        }}>
+          <Link to="/" onClick={() => setMobileMenuOpen(false)} style={mobileLinkStyle}>Home</Link>
+          {user ? (
+            <>
+              <Link to="/marketplace" onClick={() => setMobileMenuOpen(false)} style={mobileLinkStyle}>Marketplace</Link>
+              <Link to="/sell" onClick={() => setMobileMenuOpen(false)} style={mobileLinkStyle}>
+                <PlusCircle size={18} style={{ color: 'var(--primary)', marginRight: '8px' }} /> Sell An Item
+              </Link>
+              <Link to="/chat" onClick={() => setMobileMenuOpen(false)} style={mobileLinkStyle}>
+                <MessageSquare size={18} style={{ color: 'var(--primary)', marginRight: '8px' }} /> Chat
+                {globalUnread > 0 && (
+                  <span style={{
+                    background: '#16a34a',
+                    color: 'white',
+                    fontSize: '0.65rem',
+                    fontWeight: 'bold',
+                    borderRadius: '8px',
+                    padding: '2px 6px',
+                    marginLeft: '8px'
+                  }}>{globalUnread}</span>
+                )}
+              </Link>
+              <div style={{ fontWeight: '700', fontSize: '0.75rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '10px' }}>My Account</div>
+              <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} style={mobileSubLinkStyle}>🏠 Dashboard</Link>
+              <Link to="/my-listings" onClick={() => setMobileMenuOpen(false)} style={mobileSubLinkStyle}>📦 My Listings</Link>
+              <Link to="/purchases" onClick={() => setMobileMenuOpen(false)} style={mobileSubLinkStyle}>🛍️ Purchases</Link>
+              <Link to="/wishlist" onClick={() => setMobileMenuOpen(false)} style={mobileSubLinkStyle}>❤️ Wishlist</Link>
+              
+              <div style={{ fontWeight: '700', fontSize: '0.75rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '10px' }}>Help & Support</div>
+              <Link to="/story" onClick={() => setMobileMenuOpen(false)} style={mobileSubLinkStyle}>📖 Our Story</Link>
+              <Link to="/faq" onClick={() => setMobileMenuOpen(false)} style={mobileSubLinkStyle}>❓ FAQ</Link>
+              <Link to="/contact" onClick={() => setMobileMenuOpen(false)} style={mobileSubLinkStyle}>✉️ Contact Us</Link>
+              
+              <button onClick={() => { setMobileMenuOpen(false); setShowLogoutModal(true); }} style={{
+                background: 'none', border: 'none', color: '#ef4444', textAlign: 'left',
+                fontWeight: '600', fontSize: '1rem', padding: '12px 0', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: '8px', borderTop: '1px solid #f1f5f9', marginTop: '10px'
+              }}>
+                🚪 Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/story" onClick={() => setMobileMenuOpen(false)} style={mobileLinkStyle}>Our Story</Link>
+              <Link to="/faq" onClick={() => setMobileMenuOpen(false)} style={mobileLinkStyle}>FAQ</Link>
+              <Link to="/contact" onClick={() => setMobileMenuOpen(false)} style={mobileLinkStyle}>Contact Us</Link>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)} style={{
+                  flex: 1, background: '#C02535', color: 'white', padding: '12px',
+                  borderRadius: '8px', textAlign: 'center', fontWeight: '700', textDecoration: 'none'
+                }}>LOGIN</Link>
+                <Link to="/register" onClick={() => setMobileMenuOpen(false)} style={{
+                  flex: 1, border: '2px solid #C02535', color: '#C02535', padding: '10px',
+                  borderRadius: '8px', textAlign: 'center', fontWeight: '700', textDecoration: 'none'
+                }}>REGISTER</Link>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+    );
 };
 
       export default Navbar;
